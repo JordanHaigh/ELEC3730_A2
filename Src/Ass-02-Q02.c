@@ -24,70 +24,68 @@ void showButton(Button button);
 void buttonToString(Button button);
 void CalculatorInit(void);
 void CalculatorProcess(void);
-void analyseTouch(Button currentButtonPressed);
+//void analyseTouch(Button currentButtonPressed);
 
 
-void analyseTouch(Button currentButtonPressed)
-{
-	//0,1,2,  ,  , 5,6,7,  ,  ,10,11,12,  ,  ,  15,  ,  ,  ,  ,
-
-	if(currentButtonPressed.id == 0 ||  //7
-			currentButtonPressed.id == 1 || //8
-			currentButtonPressed.id == 2 || //9
-			currentButtonPressed.id == 5 || //4
-			currentButtonPressed.id == 6 || //5
-			currentButtonPressed.id == 7 ||  //6
-			currentButtonPressed.id == 10 ||//1
-			currentButtonPressed.id == 11 ||//2
-			currentButtonPressed.id == 12 )//3
-	{
-		buildInputString(currentButtonPressed.text);
-	}
-	else if(currentButtonPressed.id == 15) //0 -- Check that 0 is not the first char in the input string. otherwise
-	{
-		buildInputString(currentButtonPressed.text);
-	}
-	else if(currentButtonPressed.id == 16) //decimal point
-	{
-		buildInputString(currentButtonPressed.text);
-	}
-
-
-
-
-	//Check if it is equals, div or times first
-	//display error message saying that there isnt any numbers yet
-
-	//if 0-9, clr, +-
-
-
-
-}
-
-static char *inputString = "0";
-static char *outputString;
-int stringLength = 1;
-void generateInputString(char *str)
-{
-	if(strcmp(str, inputString) == 0)
-	{
-		//when the input string contains only a zero and the string trying to be appended is also 0
-		//do nothing, its still zero
-		return;
-	}
-	if(strcmp(str, ".") == 0)
-	{
-		//append decimal point to next position of string array
-		inputString = (char*)realloc(inputString, sizeof(inputString)+1);
-		//
-	}
-
-
-}
-
-
-
-
+//void analyseTouch(Button currentButtonPressed)
+//{
+//	//0,1,2,  ,  , 5,6,7,  ,  ,10,11,12,  ,  ,  15,  ,  ,  ,  ,
+//
+//	if(currentButtonPressed.id == 0 ||  //7
+//			currentButtonPressed.id == 1 || //8
+//			currentButtonPressed.id == 2 || //9
+//			currentButtonPressed.id == 5 || //4
+//			currentButtonPressed.id == 6 || //5
+//			currentButtonPressed.id == 7 ||  //6
+//			currentButtonPressed.id == 10 ||//1
+//			currentButtonPressed.id == 11 ||//2
+//			currentButtonPressed.id == 12 )//3
+//	{
+//		buildInputString(currentButtonPressed.text);
+//	}
+//	else if(currentButtonPressed.id == 15) //0 -- Check that 0 is not the first char in the input string. otherwise
+//	{
+//		buildInputString(currentButtonPressed.text);
+//	}
+//	else if(currentButtonPressed.id == 16) //decimal point
+//	{
+//		buildInputString(currentButtonPressed.text);
+//	}
+//
+//
+//
+//
+//	//Check if it is equals, div or times first
+//	//display error message saying that there isnt any numbers yet
+//
+//	//if 0-9, clr, +-
+//
+//
+//
+//}
+//
+//static char *inputString = "0";
+//static char *outputString;
+//int stringLength = 1;
+//void generateInputString(char *str)
+//{
+//	if(strcmp(str, inputString) == 0)
+//	{
+//		//when the input string contains only a zero and the string trying to be appended is also 0
+//		//do nothing, its still zero
+//		return;
+//	}
+//	if(strcmp(str, ".") == 0)
+//	{
+//		//append decimal point to next position of string array
+//		inputString = (char*)realloc(inputString, sizeof(inputString)+1);
+//		//
+//	}
+//
+//
+//}
+//
+//
 
 
 
@@ -96,55 +94,6 @@ void generateInputString(char *str)
 
 
 
-char* newString;
-static int buildInputStringFirstTime = 0;
-static int stringIndex = 0;
-
-void buildInputString(char *c){
-	if(buildInputStringFirstTime == 1)	  {
-	  newString = (char*)malloc(strlen(c)); //start of string. will have reallocation of memory if string is longer
-	  buildInputStringFirstTime = 0; //now not the first run through
-	  if(c == '=') {
-		  newString[stringIndex] = '\0';
-
-		  wordCount = string_parser(newString, &array_of_words);
-
-		  //printArrayOfWords();
-		  //printf("DEBUG: word count -> %d", wordCount);
-		  analyseKeywords();
-		  freeEverything();
-
-		  //printNewString();
-		  buildInputStringFirstTime = 1; //reset
-	  }
-	  else{
-		  newString[stringIndex] = c;
-		  stringIndex++;
-	  }
-
-	}
-	else{
-		newString = (char*)realloc(newString, sizeof(newString)+1);
-
-		if(c == '\0' || c == 10){
-		  newString[stringIndex] = '\0';
-
-		  wordCount = string_parser(newString, &array_of_words);
-		  if(debugOn == 1) printArrayOfWords();
-		  analyseKeywords();
-		  freeEverything();
-
-
-		  buildInputStringFirstTime = 1; //reset
-		  stringIndex = 0; //reset
-
-		}
-		else{
-		  newString[stringIndex] = c;
-		  stringIndex++;
-		}
-	}
-}
 
 
 
@@ -235,7 +184,7 @@ void CalculatorProcess(void)
 	      printf("TOUCH:  Got (%3d,%3d)\n", display.x, display.y);
 
 
-	      analyseTouch(currentButtonPressed);
+	      //todo add in --> analyseTouch(currentButtonPressed);
 
 
 
