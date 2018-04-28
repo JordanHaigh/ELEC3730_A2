@@ -18,13 +18,19 @@ typedef struct {
 	  int id;
 }Button;
 
-char *text = {"7"};
+//char *textArray = {"7","8","9","+","-","4","5","6","/","x","1","2","3","sqrt","mod","0",".","clr","pow","="};
 
-int buttonHere(int x, int y, Button button){
-	return (button.startX  < x &&
+int buttonHere(int x, int y, Button button)
+{
+	//returns the button id or -1
+
+	if(button.startX  < x &&
 			x < button.startX + button.width &&
 			button.startY  < y &&
-			y < button.startY + button.height);
+			y < button.startY + button.height)
+		return button.id;
+	else
+		return -1;
 }
 
 Button buildButton(int x , int y, int w, int h, int id){
@@ -34,6 +40,9 @@ Button buildButton(int x , int y, int w, int h, int id){
 	b.width = w;
 	b.height = h;
 	b.id = id;
+
+
+	//b.text = textArray[id];
 
 	switch(id){
 	case 0:
@@ -79,7 +88,7 @@ Button buildButton(int x , int y, int w, int h, int id){
 			b.text = "sqrt";
 			break;
 	case 14:
-			b.text = "mod";
+			b.text = "+-"; //todo add back mod in future
 			break;
 	case 15:
 			b.text = "0";
@@ -107,7 +116,18 @@ void showButton(Button button){
 
 }
 
+void buttonToString(Button button)
+{
+	printf("Debug: \n");
+	printf("Button startX: %d\n", button.startX);
+	printf("Button startY: %d\n", button.startY);
+	printf("Button width: %d\n", button.width);
+	printf("Button height: %d\n", button.height);
+	printf("Button text: %s\n", button.text);
+	printf("Button id: %d\n", button.id);
+}
 
+Button buttons[20];
 
 void CalculatorInit(void)
 {
@@ -129,23 +149,17 @@ void CalculatorInit(void)
   printf("height = %d\n", (int)BSP_LCD_GetYSize());
 
   //320 240
-  //Draw output box
-
-  Button buttons[20];
+    //initialise buttons for screen
+  //Button buttons[21]; //originally 20 buttons,extra NULL is added to array for termination
   for(int i = 0 ; i < 5; i++)
   {
 	  for(int j = 0 ; j < 4 ;j++)
 	  {
 		  buttons[j * 5 + i] = buildButton(64* i, 80 + 40*j, 64,40,j* 5 + i);
 		  showButton(buttons[j*5+i]);
+		  buttonToString(buttons[j*5+i]);
 	  }
   }
-
-
-
-  //BSP_LCD_DrawHLine(  0, 196, 320); //xstart, y start, length
-  //BSP_LCD_DrawVLine(  1, 198,  35);
-
 
 
 //  // Create colour choices
@@ -190,15 +204,49 @@ void CalculatorProcess(void)
 {
   // STEPIEN: Assume horizontal display
 
+
   uint16_t linenum = 0;
 
+
+  //Determine safe touch of LCD
+  uint8_t safeTouch = BSP_TP_GetDisplayPoint(&display);
+  //Now determine which button was pressed on touch screen
+  if(safeTouch == 0)//0 means valid point on LCD. 1 otherwise(bad coordinate or dodgy LCD)
+  {
+	  Button currentButtonPressed;
+
+
+	  for(int i = 0; i < 20;i++)
+	  {
+		  if(buttonHere(display.x, display.y, buttons[i])!= -1)
+		  {
+			  currentButtonPressed = buttons[i];
+			  break;
+		  }
+	  }
+
+	  printf("I am touching the '%s'. ID is %d \n" , currentButtonPressed.text, currentButtonPressed.id);
+      printf("TOUCH:  Got (%3d,%3d)\n", display.x, display.y);
+      //todo bug when sliding finger across buttons causes infinite junk to be printed
+  }
+  else
+  {
+	  //do not print anything in here. you will regret it.
+	  //trust me I know.
+	  //printf("INVALID TOUCH");
+  }
+
+
+
   // getDisplayPoint(&display, Read_Ads7846(), &matrix );
-  if (BSP_TP_GetDisplayPoint(&display) == 0)
+  if (BSP_TP_GetDisplayPoint(&display) == 0) //0 means valid display point
   {
   if(((display.y < 190) && (display.y >= 2)))
   {
     if((display.x >= 318) || (display.x < 2))
-    {}
+    {
+
+    }
     else
     {
       BSP_LCD_FillCircle(display.x, display.y, 2);
