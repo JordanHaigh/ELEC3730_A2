@@ -4,10 +4,6 @@
 
 #include "Ass-02.h"
 
-//
-// REPLACE THE EXAMPLE CODE WITH YOUR CODE 
-//
-
 typedef struct {
 	  int startX;
 	  int startY;
@@ -18,8 +14,10 @@ typedef struct {
 	  int id;
 }Button;
 
-//char *textArray = {"7","8","9","+","-","4","5","6","/","x","1","2","3","sqrt","mod","0",".","clr","pow","="};
-
+static Button buttons[20];
+char *textArray[] = {"7","8","9","+","-","4","5","6","/","x","1","2","3","sqrt","mod","0",".","clr","pow","="};
+char *inputString[];
+char *outputString[];
 int buttonHere(int x, int y, Button button)
 {
 	//returns the button id or -1
@@ -40,79 +38,16 @@ Button buildButton(int x , int y, int w, int h, int id){
 	b.width = w;
 	b.height = h;
 	b.id = id;
+	//b.text = "";
 
+	b.text = textArray[id];
 
-	//b.text = textArray[id];
-
-	switch(id){
-	case 0:
-		b.text = "7";
-		break;
-	case 1:
-			b.text = "8";
-			break;
-	case 2:
-			b.text = "9";
-			break;
-	case 3:
-			b.text = "+";
-			break;
-	case 4:
-			b.text = "-";
-			break;
-	case 5:
-			b.text = "4";
-			break;
-	case 6:
-			b.text = "5";
-			break;
-	case 7:
-			b.text = "6";
-			break;
-	case 8:
-			b.text = "/";
-			break;
-	case 9:
-			b.text = "x";
-			break;
-	case 10:
-			b.text = "1";
-			break;
-	case 11:
-			b.text = "2";
-			break;
-	case 12:
-			b.text = "3";
-			break;
-	case 13:
-			b.text = "sqrt";
-			break;
-	case 14:
-			b.text = "+-"; //todo add back mod in future
-			break;
-	case 15:
-			b.text = "0";
-			break;
-	case 16:
-			b.text = ".";
-			break;
-	case 17:
-			b.text = "clr";
-			break;
-	case 18:
-			b.text = "pow";
-			break;
-	case 19:
-			b.text = "=";
-			break;
-
-	}
 	return b;
 }
 
 void showButton(Button button){
 	BSP_LCD_DrawRect(button.startX, button.startY, button.width, button.height);
-	BSP_LCD_DisplayStringAt(button.startX + button.width/2,button.startY + button.height/2,(button.text),LEFT_MODE);
+	BSP_LCD_DisplayStringAt(button.startX + button.width/2,button.startY + button.height/2,button.text,LEFT_MODE);
 
 }
 
@@ -127,7 +62,6 @@ void buttonToString(Button button)
 	printf("Button id: %d\n", button.id);
 }
 
-Button buttons[20];
 
 void CalculatorInit(void)
 {
@@ -200,101 +134,143 @@ void CalculatorInit(void)
 //  BSP_LCD_DrawHLine(  1, 232, 320);
 }
 
+
+
 void CalculatorProcess(void)
 {
   // STEPIEN: Assume horizontal display
+  //uint16_t linenum = 0;
 
 
-  uint16_t linenum = 0;
 
+  static uint8_t fingerTouching = 0;
+  static uint8_t bounce = 0;
 
-  //Determine safe touch of LCD
-  uint8_t safeTouch = BSP_TP_GetDisplayPoint(&display);
   //Now determine which button was pressed on touch screen
-  if(safeTouch == 0)//0 means valid point on LCD. 1 otherwise(bad coordinate or dodgy LCD)
+  if(BSP_TP_GetDisplayPoint(&display) == 0 && fingerTouching == 0)//0 means valid point on LCD. 1 otherwise(bad coordinate or dodgy LCD)
   {
-	  Button currentButtonPressed;
-
-
-	  for(int i = 0; i < 20;i++)
+	  //printf("Bouncing..\n");
+	  bounce++;
+	  if(bounce == 1)
 	  {
-		  if(buttonHere(display.x, display.y, buttons[i])!= -1)
-		  {
-			  currentButtonPressed = buttons[i];
-			  break;
-		  }
-	  }
+		  printf("Finger on..\n");
+		  fingerTouching = 1;
+		  bounce = 0;
 
-	  printf("I am touching the '%s'. ID is %d \n" , currentButtonPressed.text, currentButtonPressed.id);
-      printf("TOUCH:  Got (%3d,%3d)\n", display.x, display.y);
-      //todo bug when sliding finger across buttons causes infinite junk to be printed
+		  Button currentButtonPressed;
+		  //initialise text and id for now. gets around warnings thrown in the below printf.
+		  //if an actual button is found, it will update the currentButtonPressed
+		  currentButtonPressed.text = "OUTPUT BAR- NOT A BUTTON";
+		  currentButtonPressed.id = 999;
+
+		  for(int i = 0; i < 20;i++)
+		  {
+			  if(buttonHere(display.x, display.y, buttons[i])!= -1)
+			  {
+				  printf("Found button..\n");
+
+				  currentButtonPressed = buttons[i];
+			  }
+		  }
+
+
+
+		  printf("I am touching the '%s'. ID is %d \n" , currentButtonPressed.text, currentButtonPressed.id);
+	      printf("TOUCH:  Got (%3d,%3d)\n", display.x, display.y);
+
+
+
+	  }
   }
-  else
+  else if(fingerTouching == 1)
   {
-	  //do not print anything in here. you will regret it.
-	  //trust me I know.
-	  //printf("INVALID TOUCH");
+	  if(BSP_TP_GetDisplayPoint(&display) == 0)
+	  {
+		  //still touching
+	  }
+	  else
+	  {
+		  fingerTouching = 0;
+		  printf("Finger off..\n");
+	  }
   }
+
+  //todo implement debouncing
+  //fucking forloops dont work
+}
+
+//  else if(BSP_TP_GetDisplayPoint(&display) == 1)
+//  {
+//	  //Finger is not touching board
+//	  fingerTouching = 0;
+//	  if(fingerTouching == 1)
+//	  {
+//		//may possibly mean that finger is still on board
+//		  printf("finger off..\n");
+//		  bounce = 0;
+//	  }
+//  }
+
 
 
 
   // getDisplayPoint(&display, Read_Ads7846(), &matrix );
-  if (BSP_TP_GetDisplayPoint(&display) == 0) //0 means valid display point
-  {
-  if(((display.y < 190) && (display.y >= 2)))
-  {
-    if((display.x >= 318) || (display.x < 2))
-    {
-
-    }
-    else
-    {
-      BSP_LCD_FillCircle(display.x, display.y, 2);
-      printf("TOUCH:  Got (%3d,%3d)\n", display.x, display.y);
-    }
-  }
-  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 180) && (display.x <= 210))
-  {
-    BSP_LCD_SetTextColor(LCD_COLOR_ORANGE);
-  }
-  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 215) && (display.x <= 245))
-  {
-    BSP_LCD_SetTextColor(LCD_COLOR_CYAN);
-  }
-  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 250) && (display.x <= 280))
-  {
-    BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
-  }
-  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 5) && (display.x <= 35))
-  {
-    BSP_LCD_SetTextColor(LCD_COLOR_RED);
-  }
-  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 40) && (display.x <= 70))
-  {
-    BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-  }
-  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 75) && (display.x <= 105))
-  {
-    BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-  }
-  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 110) && (display.x <= 140))
-  {
-    BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-  }
-  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 145) && (display.x <= 175))
-  {
-    BSP_LCD_SetTextColor(LCD_COLOR_MAGENTA);
-  }
-  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 285) && (display.x <= 315))
-  {
-    BSP_LCD_SetFont(&Font8);
-    for(linenum = 0; linenum < 24; linenum++)
-    {
-      BSP_LCD_ClearStringLine(linenum);
-    }
-  }
-  else
-  {
-  }
-  }
-}
+//  if (BSP_TP_GetDisplayPoint(&display) == 0) //0 means valid display point
+//  {
+//	  if(((display.y < 190) && (display.y >= 2)))
+//	  {
+//		if((display.x >= 318) || (display.x < 2))
+//		{
+//
+//		}
+//		else
+//		{
+//		  BSP_LCD_FillCircle(display.x, display.y, 2);
+//		  printf("TOUCH:  Got (%3d,%3d)\n", display.x, display.y);
+//		}
+//	  }
+//	  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 180) && (display.x <= 210))
+//	  {
+//		BSP_LCD_SetTextColor(LCD_COLOR_ORANGE);
+//	  }
+//	  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 215) && (display.x <= 245))
+//	  {
+//		BSP_LCD_SetTextColor(LCD_COLOR_CYAN);
+//	  }
+//	  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 250) && (display.x <= 280))
+//	  {
+//		BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
+//	  }
+//	  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 5) && (display.x <= 35))
+//	  {
+//		BSP_LCD_SetTextColor(LCD_COLOR_RED);
+//	  }
+//	  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 40) && (display.x <= 70))
+//	  {
+//		BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+//	  }
+//	  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 75) && (display.x <= 105))
+//	  {
+//		BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+//	  }
+//	  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 110) && (display.x <= 140))
+//	  {
+//		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+//	  }
+//	  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 145) && (display.x <= 175))
+//	  {
+//		BSP_LCD_SetTextColor(LCD_COLOR_MAGENTA);
+//	  }
+//	  else if ((display.y <= 230) && (display.y >= 190) && (display.x >= 285) && (display.x <= 315))
+//	  {
+//		BSP_LCD_SetFont(&Font8);
+//		for(linenum = 0; linenum < 24; linenum++)
+//		{
+//		  BSP_LCD_ClearStringLine(linenum);
+//		}
+//	  }
+//	  else
+//	  {
+//	  }
+//  }
+//}
