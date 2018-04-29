@@ -33,22 +33,26 @@ void printArrayOfWords()
 
 void buildInputString(uint8_t c);
 int string_parser(char *inp, char **array_of_words_p[]);
-void analyseKeywords();
 void freeEverything()
 {
 	free(newString);
 	free(array_of_words);
 }
 
+double parseString();
+
 
 
 //char* inputString = "0";
 char* inputString;
+static int inputStringIndex = 0;
+static int decimalPointPlaced = 0;
 char* textArray[] = {"7","8","9","+","-","4","5","6","/","*","1","2","3","sqrt","=-","0",".","clr","pow","="};
 
 static int firstTime = 1;
 void playground()
 {
+	//https://stackoverflow.com/a/6161123
 	if(firstTime == 1)
 	{
 		inputString = malloc(sizeof(char) * 1);
@@ -98,21 +102,127 @@ void playground()
 			strcpy(inputString, buttonText);
 		}
 
-		if(strcmp(buttonText, ".") == 0)
+		if(strcmp(buttonText, ".") == 0 || strcmp(buttonText, "+") == 0
+				|| strcmp(buttonText, "-") == 0 || strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
 		{
 			inputString = realloc(inputString, sizeof(inputString)+1);
 			strcat(inputString, buttonText);
+
+			decimalPointPlaced = 1;
+			inputStringIndex += strlen(buttonText);
+			printf("inputstringindex => %d\n", inputStringIndex);
+
 		}
 
 	}
+	else if(strcmp(buttonText, "0") == 0 || strcmp(buttonText, "1") == 0 || strcmp(buttonText, "2") == 0 ||
+			strcmp(buttonText, "3") == 0 || strcmp(buttonText, "4") == 0 || strcmp(buttonText, "5") == 0 ||
+			strcmp(buttonText, "6") == 0 || strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 ||
+			strcmp(buttonText, "9") == 0)
+	{
+		//append to end of string
+		inputString = realloc(inputString, sizeof(inputString)+1);
+		strcat(inputString, buttonText);
 
+		inputStringIndex += strlen(buttonText);
+		printf("inputstringindex => %d\n", inputStringIndex);
+	}
+	else if(strcmp(buttonText, ".") == 0)
+	{
+		//make sure there isnt a decimal point already placed
+		if(decimalPointPlaced == 0)
+		{
+			//go for it
+			decimalPointPlaced = 1;
 
+			inputString = realloc(inputString, sizeof(inputString)+1);
+			strcat(inputString, buttonText);
 
+			inputStringIndex += strlen(buttonText);
+			printf("inputstringindex => %d\n", inputStringIndex);
+		}
+		else
+		{
+			printf("error. already placed decimal point...\n");
+			return;
+		}
+	}
+	else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
+			strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
+	{
+		printf("found +,-,/,*\n");
 
+		char previousChar = inputString[inputStringIndex];
+		printf("comparing char=> %c",previousChar);
+		//check that operator is not placed twice in a row
+		if((previousChar == '+' && strcmp(buttonText, "+") == 0) ||
+				(previousChar == '-' && strcmp(buttonText, "-") == 0) ||
+				(previousChar == '/' && strcmp(buttonText, "/") == 0) ||
+				(previousChar == '*' && strcmp(buttonText, "*") == 0))
+		{
+			//error cant do that mate
+			printf("Error. cannot have 2 operators in a row\n");
+			return;
+		}
+		else if((previousChar == '-' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"+") == 0)
+		{
+			inputString[inputStringIndex] = '+';
+		}
+		else if((previousChar == '+' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"-") == 0)
+		{
+			inputString[inputStringIndex] = '-';
+		}
+		else if((previousChar == '+' || previousChar == '-' || previousChar == '*') && strcmp(buttonText,"/") == 0)
+		{
+			inputString[inputStringIndex] = '/';
+		}
+		else if((previousChar == '+' || previousChar == '-' || previousChar == '/') && strcmp(buttonText,"*") == 0)
+		{
+			inputString[inputStringIndex] = '*';
+		}
+		else //add like normal
+		{
+			//go for it mate
+			inputString = realloc(inputString, sizeof(inputString)+1);
+			strcat(inputString, buttonText);
 
+			inputStringIndex += strlen(buttonText);
+			printf("inputstringindex => %d\n", inputStringIndex);
 
+		}
+	}
+	else if(strcmp(buttonText, "=") == 0)
+	{
+		double result = parseString();
+		result ++;
+		//cannot parse string if there is an operator at the end of string
+		//reset variables
+		//strcpy(inputString,result);
+		//todo get iplementation for double to string for output
+		//free(inputString);
+
+		firstTime = 1;
+		inputStringIndex = 0;
+		decimalPointPlaced = 0;
+
+	}
+	else if(strcmp(buttonText, "clr") == 0)
+	{
+		printf("in clr with non empty string\n");
+		//reset variables
+		strcpy(inputString,"0");
+		//free(inputString);
+		firstTime = 1;
+		inputStringIndex = 0;
+		decimalPointPlaced = 0;
+	}
 }
 
+double parseString()
+{
+	printf("Fuck off parsing isnt implemented yet\n");
+	return 1.0;
+}
 
 void CommandLineParserInit(void)
 {
@@ -182,7 +292,8 @@ void buildInputString(uint8_t c){
 		  //analyseKeywords();
 
 		  playground();
-		  printf("Current string %s\n", inputString);
+		  printf("Current string =>%s\n", inputString);
+		  printf("Current stringIndex => %d\n", inputStringIndex);
 		  freeEverything();
 
 		  //printNewString();
