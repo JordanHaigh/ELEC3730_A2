@@ -14,6 +14,7 @@ typedef struct {
 	  int id;
 }Button;
 
+
 static Button buttons[20];
 char *textArray[] = {"7","8","9","+","-","4","5","6","/","x","1","2","3","sqrt","+-","0",".","clr","pow","="};
 char* inputString;
@@ -286,6 +287,13 @@ void analyseTouch(Button currentButtonPressed)
 		inputStringIndex = 0;
 		decimalPointPlaced = 0;
 	}
+
+
+
+
+
+
+	printf("Current String=> %s\n", inputString);
 }
 
 double doEquals()
@@ -354,13 +362,14 @@ void CalculatorProcess(void)
 
   static uint8_t fingerTouching = 0;
   static uint8_t bounce = 0;
+  static uint8_t offBounce = 0;
 
   //Now determine which button was pressed on touch screen
   if(BSP_TP_GetDisplayPoint(&display) == 0 && fingerTouching == 0)//0 means valid point on LCD. 1 otherwise(bad coordinate or dodgy LCD)
   {
 	  //printf("Bouncing..\n");
 	  bounce++;
-	  if(bounce == 10)
+	  if(bounce == 50)
 	  {
 		  printf("Finger on..\n");
 		  fingerTouching = 1;
@@ -385,8 +394,8 @@ void CalculatorProcess(void)
 		  printf("I am touching the '%s'. ID is %d \n" , currentButtonPressed.text, currentButtonPressed.id);
 	      printf("TOUCH:  Got (%3d,%3d)\n", display.x, display.y);
 
-
-	      analyseTouch(currentButtonPressed);
+	      if(currentButtonPressed.id != 999)
+	    	  analyseTouch(currentButtonPressed);
 
 
 
@@ -394,17 +403,16 @@ void CalculatorProcess(void)
 
 	  }
   }
-  else if(fingerTouching == 1)
+  else if(BSP_TP_GetDisplayPoint(&display) == 1)
   {
-	  if(BSP_TP_GetDisplayPoint(&display) == 0)
-	  {
-		  //still touching
-	  }
-	  else
+	  offBounce++;
+	  if(offBounce == 50)
 	  {
 		  fingerTouching = 0;
-		  printf("Finger off..\n");
+		  //printf("Finger off..\n");
+
 	  }
+
   }
 
   //todo implement debouncing - busy waiting doesnt fucking work
