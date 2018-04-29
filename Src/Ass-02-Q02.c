@@ -16,7 +16,7 @@ typedef struct {
 
 
 static Button buttons[20];
-char *textArray[] = {"7","8","9","+","-","4","5","6","/","x","1","2","3","sqrt","+-","0",".","clr","pow","="};
+char *textArray[] = {"7","8","9","+","-","4","5","6","/","*","1","2","3","sqrt","+-","0",".","clr","pow","="};
 char* inputString;
 char* outputString;
 
@@ -152,17 +152,17 @@ void analyseTouch(Button currentButtonPressed)
 		if(strcmp(buttonText,"0") == 0)
 		{
 			printf("0 was entered. Nothing to achieve on blank string\n");
-			return;
+			//return;
 		}
 		if(strcmp(buttonText, "=") == 0)
 		{
 			printf("= was entered. Nothing to achieve on blank string\n");
-			return;
+			//return;
 		}
 		if(strcmp(buttonText, "clr") == 0)
 		{
 			printf("clr was entered. Nothing to achieve on blank string\n");
-			return;
+			//return;
 		}
 		if(strcmp(buttonText, "1") == 0 ||strcmp(buttonText, "2") == 0 || strcmp(buttonText, "3") == 0 ||
 				strcmp(buttonText, "4") == 0 ||strcmp(buttonText, "5") == 0 || strcmp(buttonText, "6") == 0 ||
@@ -173,8 +173,7 @@ void analyseTouch(Button currentButtonPressed)
 			strcpy(inputString, buttonText);
 		}
 
-		if(strcmp(buttonText, ".") == 0 || strcmp(buttonText, "+") == 0
-				|| strcmp(buttonText, "-") == 0 || strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
+		if(strcmp(buttonText, ".") == 0)
 		{
 			inputString = realloc(inputString, sizeof(inputString)+1);
 			strcat(inputString, buttonText);
@@ -183,6 +182,15 @@ void analyseTouch(Button currentButtonPressed)
 			inputStringIndex += strlen(buttonText);
 			printf("inputstringindex => %d\n", inputStringIndex);
 
+		}
+		if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
+				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
+		{
+			inputString = realloc(inputString, sizeof(inputString)+1);
+			strcat(inputString, buttonText);
+
+			inputStringIndex += strlen(buttonText);
+			printf("inputstringindex => %d\n", inputStringIndex);
 		}
 
 	}
@@ -215,7 +223,7 @@ void analyseTouch(Button currentButtonPressed)
 		else
 		{
 			printf("error. already placed decimal point...\n");
-			return;
+			//return;
 		}
 	}
 	else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
@@ -238,22 +246,33 @@ void analyseTouch(Button currentButtonPressed)
 		else if((previousChar == '-' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"+") == 0)
 		{
 			inputString[inputStringIndex] = '+';
+			decimalPointPlaced = 0;
+
 		}
 		else if((previousChar == '+' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"-") == 0)
 		{
 			inputString[inputStringIndex] = '-';
+			decimalPointPlaced = 0;
+
 		}
 		else if((previousChar == '+' || previousChar == '-' || previousChar == '*') && strcmp(buttonText,"/") == 0)
 		{
 			inputString[inputStringIndex] = '/';
+			decimalPointPlaced = 0;
+
 		}
 		else if((previousChar == '+' || previousChar == '-' || previousChar == '/') && strcmp(buttonText,"*") == 0)
 		{
 			inputString[inputStringIndex] = '*';
+			decimalPointPlaced = 0;
+
 		}
 		else //add like normal
 		{
 			//go for it mate
+
+			decimalPointPlaced = 0;
+
 			inputString = realloc(inputString, sizeof(inputString)+1);
 			strcat(inputString, buttonText);
 
@@ -264,17 +283,29 @@ void analyseTouch(Button currentButtonPressed)
 	}
 	else if(strcmp(buttonText, "=") == 0)
 	{
-		double result = doEquals();
-		result ++;
-		//cannot parse string if there is an operator at the end of string
-		//reset variables
-		//strcpy(inputString,result);
-		//todo get iplementation for double to string for output
-		//free(inputString);
+		char lastChar = inputString[inputStringIndex];
+		if(lastChar == '+' || lastChar ==  '-' || lastChar ==  '/' ||  lastChar == '*')
+		{
+			printf("Error. last character is an operator. cannot do equals yet\n");
+		}
+		else
+		{
+			double result = doEquals();
+			result ++;
+			strcpy(inputString,"0");
 
-		firstTime = 1;
-		inputStringIndex = 0;
-		decimalPointPlaced = 0;
+			//cannot parse string if there is an operator at the end of string
+			//reset variables
+			//strcpy(inputString,result);
+			//todo get iplementation for double to string for output
+			//free(inputString);
+
+			firstTime = 1;
+			inputStringIndex = 0;
+			decimalPointPlaced = 0;
+		}
+
+
 
 	}
 	else if(strcmp(buttonText, "clr") == 0)
@@ -286,6 +317,11 @@ void analyseTouch(Button currentButtonPressed)
 		firstTime = 1;
 		inputStringIndex = 0;
 		decimalPointPlaced = 0;
+	}
+	else
+	{
+
+		printf("Hey you pressed a button that doesnt have implementation yet\n");
 	}
 
 
@@ -369,7 +405,7 @@ void CalculatorProcess(void)
   {
 	  //printf("Bouncing..\n");
 	  bounce++;
-	  if(bounce == 50)
+	  if(bounce == 25)
 	  {
 		  printf("Finger on..\n");
 		  fingerTouching = 1;
@@ -406,7 +442,7 @@ void CalculatorProcess(void)
   else if(BSP_TP_GetDisplayPoint(&display) == 1)
   {
 	  offBounce++;
-	  if(offBounce == 50)
+	  if(offBounce == 25)
 	  {
 		  fingerTouching = 0;
 		  //printf("Finger off..\n");
