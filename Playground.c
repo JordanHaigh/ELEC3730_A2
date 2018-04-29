@@ -460,3 +460,7 @@ int string_parser(char *inp, char **array_of_words_p[])
 
 	return numberOfWords;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> aceeb4c83eb1110ef813148e150d696db64210a4

@@ -112,187 +112,24 @@ void buttonToString(Button button);
 void CalculatorInit(void);
 void CalculatorProcess(void);
 void analyseTouch(Button currentButtonPressed);
-double doEquals();
 
-//char* inputString = "0";
-char* inputString;
-static int inputStringIndex = 0;
-static int decimalPointPlaced = 0;
 
-static int firstTime = 1;
-void analyseTouch(Button currentButtonPressed)
+
+
+
+void buildInputString(Button currentButtonPressed)
 {
-	//https://stackoverflow.com/a/6161123
-	if(firstTime == 1)
-	{
-		inputString = malloc(sizeof(char) * 1);
-		strcpy(inputString, "0");  //init
 
-
-		//printf("input string starts with %s", inputString);
-		firstTime = 0;
-	}
-
-	int buttonId = currentButtonPressed.id;
-
-	printf("Button id is: %d\n", buttonId);
-
-	char* buttonText = currentButtonPressed.text;
-	printf("Button to text is %s\n\n", buttonText);
-//
-//	printf("sizeof inputstring %d\n", sizeof(inputString));
-//	printf("strlen inputString %d\n\n", strlen(inputString));
-
-	if(strlen(inputString) == 1 && inputString[0] == '0') //Length 1 and only "0"
-	{
-		//blank string
-		printf("Recognised strlen of 1 and only a 0\n");
-
-		if(strcmp(buttonText,"0") == 0)
-		{
-			printf("0 was entered. Nothing to achieve on blank string\n");
-			return;
-		}
-		if(strcmp(buttonText, "=") == 0)
-		{
-			printf("= was entered. Nothing to achieve on blank string\n");
-			return;
-		}
-		if(strcmp(buttonText, "clr") == 0)
-		{
-			printf("clr was entered. Nothing to achieve on blank string\n");
-			return;
-		}
-		if(strcmp(buttonText, "1") == 0 ||strcmp(buttonText, "2") == 0 || strcmp(buttonText, "3") == 0 ||
-				strcmp(buttonText, "4") == 0 ||strcmp(buttonText, "5") == 0 || strcmp(buttonText, "6") == 0 ||
-				strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 || strcmp(buttonText, "9") == 0)
-		{
-			//replace current "0" with another number
-			printf("found %s. replacing current 0\n", buttonText);
-			strcpy(inputString, buttonText);
-		}
-
-		if(strcmp(buttonText, ".") == 0 || strcmp(buttonText, "+") == 0
-				|| strcmp(buttonText, "-") == 0 || strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
-		{
-			inputString = realloc(inputString, sizeof(inputString)+1);
-			strcat(inputString, buttonText);
-
-			decimalPointPlaced = 1;
-			inputStringIndex += strlen(buttonText);
-			printf("inputstringindex => %d\n", inputStringIndex);
-
-		}
-
-	}
-	else if(strcmp(buttonText, "0") == 0 || strcmp(buttonText, "1") == 0 || strcmp(buttonText, "2") == 0 ||
-			strcmp(buttonText, "3") == 0 || strcmp(buttonText, "4") == 0 || strcmp(buttonText, "5") == 0 ||
-			strcmp(buttonText, "6") == 0 || strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 ||
-			strcmp(buttonText, "9") == 0)
-	{
-		//append to end of string
-		inputString = realloc(inputString, sizeof(inputString)+1);
-		strcat(inputString, buttonText);
-
-		inputStringIndex += strlen(buttonText);
-		printf("inputstringindex => %d\n", inputStringIndex);
-	}
-	else if(strcmp(buttonText, ".") == 0)
-	{
-		//make sure there isnt a decimal point already placed
-		if(decimalPointPlaced == 0)
-		{
-			//go for it
-			decimalPointPlaced = 1;
-
-			inputString = realloc(inputString, sizeof(inputString)+1);
-			strcat(inputString, buttonText);
-
-			inputStringIndex += strlen(buttonText);
-			printf("inputstringindex => %d\n", inputStringIndex);
-		}
-		else
-		{
-			printf("error. already placed decimal point...\n");
-			return;
-		}
-	}
-	else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
-			strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
-	{
-		printf("found +,-,/,*\n");
-
-		char previousChar = inputString[inputStringIndex];
-		printf("comparing char=> %c",previousChar);
-		//check that operator is not placed twice in a row
-		if((previousChar == '+' && strcmp(buttonText, "+") == 0) ||
-				(previousChar == '-' && strcmp(buttonText, "-") == 0) ||
-				(previousChar == '/' && strcmp(buttonText, "/") == 0) ||
-				(previousChar == '*' && strcmp(buttonText, "*") == 0))
-		{
-			//error cant do that mate
-			printf("Error. cannot have 2 operators in a row\n");
-			return;
-		}
-		else if((previousChar == '-' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"+") == 0)
-		{
-			inputString[inputStringIndex] = '+';
-		}
-		else if((previousChar == '+' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"-") == 0)
-		{
-			inputString[inputStringIndex] = '-';
-		}
-		else if((previousChar == '+' || previousChar == '-' || previousChar == '*') && strcmp(buttonText,"/") == 0)
-		{
-			inputString[inputStringIndex] = '/';
-		}
-		else if((previousChar == '+' || previousChar == '-' || previousChar == '/') && strcmp(buttonText,"*") == 0)
-		{
-			inputString[inputStringIndex] = '*';
-		}
-		else //add like normal
-		{
-			//go for it mate
-			inputString = realloc(inputString, sizeof(inputString)+1);
-			strcat(inputString, buttonText);
-
-			inputStringIndex += strlen(buttonText);
-			printf("inputstringindex => %d\n", inputStringIndex);
-
-		}
-	}
-	else if(strcmp(buttonText, "=") == 0)
-	{
-		double result = doEquals();
-		result ++;
-		//cannot parse string if there is an operator at the end of string
-		//reset variables
-		//strcpy(inputString,result);
-		//todo get iplementation for double to string for output
-		//free(inputString);
-
-		firstTime = 1;
-		inputStringIndex = 0;
-		decimalPointPlaced = 0;
-
-	}
-	else if(strcmp(buttonText, "clr") == 0)
-	{
-		printf("in clr with non empty string\n");
-		//reset variables
-		strcpy(inputString,"0");
-		//free(inputString);
-		firstTime = 1;
-		inputStringIndex = 0;
-		decimalPointPlaced = 0;
-	}
 }
 
-double doEquals()
+void parseInputString()
 {
-	printf("Fuck off parsing isnt implemented yet\n");
-	return 1.0;
+
 }
+
+
+
+
 
 
 
@@ -360,7 +197,7 @@ void CalculatorProcess(void)
   {
 	  //printf("Bouncing..\n");
 	  bounce++;
-	  if(bounce == 10)
+	  if(bounce == 1)
 	  {
 		  printf("Finger on..\n");
 		  fingerTouching = 1;
@@ -386,7 +223,7 @@ void CalculatorProcess(void)
 	      printf("TOUCH:  Got (%3d,%3d)\n", display.x, display.y);
 
 
-	      analyseTouch(currentButtonPressed);
+	      //todo add in --> analyseTouch(currentButtonPressed);
 
 
 
