@@ -413,11 +413,11 @@ void debugMode()
 			else
 			{
 				debugOn = 0;
-				printf("Debug message will not be displayed");
+				printf("Debug message will not be displayed\n");
 			}
 		}
 		else
-			printf("Error. Not a valid input for debug keyword. Seek help.");
+			printf("Error. Not a valid input for debug keyword. Seek help.\n");
 	}
 
 

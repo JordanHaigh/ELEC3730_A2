@@ -37,6 +37,7 @@ void buttonToString(Button button);
 void analyseTouch(Button currentButtonPressed);
 double doEquals();
 int isOperator(char);
+char* compute(char operator,char* leftNum,char* rightNum);
 
 
 
@@ -363,8 +364,10 @@ void analyseTouch(Button currentButtonPressed)
 		firstTime = 1;
 		inputStringIndex = 0;
 		decimalPointPlaced = 0;
+		//make white rectangle
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 		BSP_LCD_FillRect(1, 1, 318, 78);
+		//revert to black text
 		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 
 	}
@@ -393,7 +396,7 @@ double doEquals()
 	strcpy(newString, "");  //init
 
 
-	printf("Fuck off parsing is kinda implemented\n");
+	printf("Parsing is kinda implemented\n");
 	char operators[2][2]= {{'*', '/'},{'+', '-'}};
 	for(int i = 0 ; i < 2; i++)
 	{
@@ -416,26 +419,51 @@ double doEquals()
 					printf("Left%d, Right %d, j %d\n", leftCounter, rightCounter , j);
 
 
-					char* charToConcat = malloc(sizeof(char)); //free later
-					strcpy(charToConcat,"");
 
-					for(int posCounter =j-leftCounter+1 ; posCounter < j+rightCounter; posCounter++ )
-					{
-						//make temp char array of size 1
-						//todo may need to extend temp char array for items with length > 1
-						//todo or it'll be fine? because we are concatenating single chars to build the new string
-						//todo then from the new string we can derive what operation is being applied.
-						char temp[1];
-						temp[0] = inputString[posCounter];
-						strcat(charToConcat,temp);
-						printf("charTOConcet ==%s \n",charToConcat );
-					}
+					char* leftNum = malloc(sizeof(char)* (leftCounter-1));
+					strncpy(leftNum, &inputString[j-leftCounter+1], leftCounter -1);
+					char* rightNum = malloc(sizeof(char)* (rightCounter-1));
+					strncpy(rightNum, &inputString[j +1], rightCounter -1);
 
-					newString = realloc(newString, sizeof(newString)+ sizeof(charToConcat));
-					strcat(newString, charToConcat);
-					free(charToConcat);
+					printf("rightNum %s\n", rightNum );
+					printf("leftNum %s\n", leftNum);
 
-					printf("newString == %s\n", newString);
+					char* result = compute(operators[i][k],leftNum,rightNum);
+
+					char* tempString;
+					strncpy(tempString, &inputString[0], j-leftCounter+1);
+					strcat(tempString, result);
+					strcat(tempString,&inputString[j+rightCounter]);
+					printf("after computation %s",tempString);
+
+
+					strcpy(inputString, tempString);
+					free(result);
+					free(leftNum);
+					free(rightNum);
+
+
+
+//					char* charToConcat = malloc(sizeof(char)); //free later
+//					strcpy(charToConcat,"");
+//
+//					for(int posCounter =j-leftCounter+1 ; posCounter < j+rightCounter; posCounter++ )
+//					{
+//						//make temp char array of size 1
+//						//todo may need to extend temp char array for items with length > 1
+//						//todo or it'll be fine? because we are concatenating single chars to build the new string
+//						//todo then from the new string we can derive what operation is being applied.
+//						char temp[1];
+//						temp[0] = inputString[posCounter];
+//						strcat(charToConcat,temp);
+//						printf("charTOConcet ==%s \n",charToConcat );
+//					}
+//
+//					newString = realloc(newString, sizeof(newString)+ sizeof(charToConcat));
+//					strcat(newString, charToConcat);
+//					free(charToConcat);
+//
+//					printf("newString == %s\n", newString);
 				}
 			}
 		}
@@ -443,6 +471,32 @@ double doEquals()
 
 	return 1.0; //todo wrong. replace with correct result
 }
+
+
+char* compute(char operator,char* leftNum,char* rightNum){
+
+	//todo use correct names for function
+	char* result;
+	switch(operator){
+	case '*':
+		result = mult(leftNum,rightNum);
+		break;
+	case '/':
+		result = div(leftNum,rightNum);
+		break;
+	case '+':
+		result = add(leftNum,rightNum);
+		break;
+	case '-':
+		result = sub(leftNum,rightNum);
+		break;
+	}
+	return result;
+
+
+
+}
+
 
 int isOperator(char input ){
 	if(input == '*' || input == '/' || input == '+' || input == '-'){
