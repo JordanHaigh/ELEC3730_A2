@@ -17,117 +17,35 @@ typedef struct {
 
 static Button buttons[20];
 char *textArray[] = {"7","8","9","+","-","4","5","6","/","*","1","2","3","sqrt","+-","0",".","clr","pow","="};
+
 char* inputString;
 char* outputString;
 
-//double parseSum();
-//double parseProduct();
-//double parseFactor();
-//double parseNumber();
-//double parseFormula();
-//
-//double parseFactor()
-//{
-//	if(*inputString >=0 && *inputString <=9)
-//	{
-//		return *inputString++ - '0';
-//	}
-//	else if(*inputString == '(')
-//	{
-//		++inputString;
-//		double sum = parseSum();
-//		++inputString;
-//		return sum;
-//	}
-//	else
-//	{
-//		printf("DEBUG: invalid token found\n");
-//		return  -1; //invalid parse
-//	}
-//}
-//
-//double parseProduct()
-//{
-//	double fac1 = parseFactor();
-//	while(*inputString == '*')
-//	{
-//		++inputString;
-//		double fac2 = parseFactor();
-//
-//		fac1 = fac1 * fac2;
-//	}
-//	return fac1;
-//}
-//
-//double parseSum()
-//{
-//	double prod1 = parseProduct();
-//	while(*inputString == '+')
-//	{
-//		++inputString;
-//		double prod2= parseProduct();
-//
-//		prod1 = prod1 * prod2;
-//	}
-//
-//	return prod1;
-//}
-//
-//double parseFormula()
-//{
-//	double result = parseSum();
-//	if(*inputString == '\0')
-//	{
-//		return result;
-//	}
-//}
-//
-//double parseNumber()
-//{
-//	double number = 0;
-//	while(*inputString >= '0' && *inputString <= '9')
-//	{
-//		number = number * 10;
-//		number = *inputString - '0' + number;
-//		++inputString;
-//	}
-//	if(++*inputString == '.')
-//	{
-//		++inputString; //consume decimal point
-//		double weight = 1;
-//		while(*inputString >= '0' && *inputString <= '9')
-//		{
-//			weight = weight / 10;
-//			double scalar = *inputString - '0' * weight;
-//			++inputString;
-//		}
-//
-//	}
-//	return number;
-//}
+static int inputStringIndex = 0;
+static int decimalPointPlaced = 0;
+static int firstTime = 1;
 
-int buttonHere(int x, int y, Button button);
-Button buildButton(int x, int y, int w, int h, int id);
-void showButton(Button button);
-void buttonToString(Button button);
+
 void CalculatorInit(void);
 void CalculatorProcess(void);
+
+Button buildButton(int x, int y, int w, int h, int id);
+int buttonHere(int x, int y, Button button);
+void showButton(Button button);
+void buttonToString(Button button);
+
 void analyseTouch(Button currentButtonPressed);
 double doEquals();
 int isOperator(char);
 
-//char* inputString = "0";
-char* inputString;
-static int inputStringIndex = 0;
-static int decimalPointPlaced = 0;
 
-static int firstTime = 1;
 
+/**************************Calculator Methods********************************/
 
 
 void CalculatorInit(void)
 {
-  // STEPIEN: Assume horizontal display
+  //Assume horizontal display
 
   // Initialize and turn on LCD and calibrate the touch panel
   BSP_LCD_Init();
@@ -138,15 +56,12 @@ void CalculatorInit(void)
   BSP_LCD_Clear(LCD_COLOR_WHITE);
   BSP_LCD_SetFont(&Font12);
   BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-  //BSP_LCD_DisplayStringAt(5,5, (uint8_t*)"ELEC3730 Assignment 2",LEFT_MODE);
-  //BSP_LCD_DisplayStringAt(5,20, (uint8_t*)"Calculator Example",LEFT_MODE);
 
   printf("width = %d\n", (int)BSP_LCD_GetXSize());
   printf("height = %d\n", (int)BSP_LCD_GetYSize());
 
   //320 240
-    //initialise buttons for screen
-  //Button buttons[21]; //originally 20 buttons,extra NULL is added to array for termination
+  //initialise buttons for screen
   for(int i = 0 ; i < 5; i++)
   {
 	  for(int j = 0 ; j < 4 ;j++)
@@ -157,330 +72,14 @@ void CalculatorInit(void)
 	  }
   }
 
-  BSP_LCD_DisplayStringAt(20,40,"0" ,LEFT_MODE);
+  BSP_LCD_DisplayStringAt(20,40,"0" ,LEFT_MODE); //init calculator with 0
 
-
-//  // Create colour choices
-//  BSP_LCD_SetTextColor(LCD_COLOR_RED);
-//  BSP_LCD_FillRect(5, 200, 30, 30);
-//  BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 //  BSP_LCD_SetFont(&Font24);
-//  BSP_LCD_DisplayChar(290, 205, 'C');
-//  BSP_LCD_DrawHLine(  0, 196, 320);
-//  BSP_LCD_DrawVLine(  1, 198,  35);
-//	BSP_LCD_SetTextColor(LCD_COLOR_ORANGE);
-
-
 }
-
-
-
-
-void analyseTouch(Button currentButtonPressed)
-{
-	//https://stackoverflow.com/a/6161123
-	if(firstTime == 1)
-	{
-		inputString = malloc(sizeof(char) * 1);
-		strcpy(inputString, "0");  //init
-
-
-		//printf("input string starts with %s", inputString);
-		firstTime = 0;
-	}
-
-	int buttonId = currentButtonPressed.id;
-
-	printf("Button id is: %d\n", buttonId);
-
-	char* buttonText = currentButtonPressed.text;
-	printf("Button to text is %s\n\n", buttonText);
-//
-//	printf("sizeof inputstring %d\n", sizeof(inputString));
-//	printf("strlen inputString %d\n\n", strlen(inputString));
-
-	if(strlen(inputString) == 1 && inputString[0] == '0') //Length 1 and only "0"
-	{
-		//blank string
-		printf("Recognised strlen of 1 and only a 0\n");
-
-		if(strcmp(buttonText,"0") == 0)
-		{
-			printf("0 was entered. Nothing to achieve on blank string\n");
-			//return;
-		}
-		if(strcmp(buttonText, "=") == 0)
-		{
-			printf("= was entered. Nothing to achieve on blank string\n");
-			//return;
-		}
-		if(strcmp(buttonText, "clr") == 0)
-		{
-			printf("clr was entered. Nothing to achieve on blank string\n");
-			//return;
-		}
-		if(strcmp(buttonText, "1") == 0 ||strcmp(buttonText, "2") == 0 || strcmp(buttonText, "3") == 0 ||
-				strcmp(buttonText, "4") == 0 ||strcmp(buttonText, "5") == 0 || strcmp(buttonText, "6") == 0 ||
-				strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 || strcmp(buttonText, "9") == 0)
-		{
-			//replace current "0" with another number
-			printf("found %s. replacing current 0\n", buttonText);
-			strcpy(inputString, buttonText);
-		}
-
-		if(strcmp(buttonText, ".") == 0)
-		{
-			inputString = realloc(inputString, sizeof(inputString)+1);
-			strcat(inputString, buttonText);
-
-			decimalPointPlaced = 1;
-			inputStringIndex += strlen(buttonText);
-			printf("inputstringindex => %d\n", inputStringIndex);
-
-		}
-		if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
-				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
-		{
-			inputString = realloc(inputString, sizeof(inputString)+1);
-			strcat(inputString, buttonText);
-
-			inputStringIndex += strlen(buttonText);
-			printf("inputstringindex => %d\n", inputStringIndex);
-		}
-
-	}
-	else if(strcmp(buttonText, "0") == 0 || strcmp(buttonText, "1") == 0 || strcmp(buttonText, "2") == 0 ||
-			strcmp(buttonText, "3") == 0 || strcmp(buttonText, "4") == 0 || strcmp(buttonText, "5") == 0 ||
-			strcmp(buttonText, "6") == 0 || strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 ||
-			strcmp(buttonText, "9") == 0)
-	{
-		//append to end of string
-		inputString = realloc(inputString, sizeof(inputString)+1);
-		strcat(inputString, buttonText);
-
-		inputStringIndex += strlen(buttonText);
-		printf("inputstringindex => %d\n", inputStringIndex);
-	}
-	else if(strcmp(buttonText, ".") == 0)
-	{
-		//make sure there isnt a decimal point already placed
-		if(decimalPointPlaced == 0)
-		{
-			//go for it
-			decimalPointPlaced = 1;
-
-			inputString = realloc(inputString, sizeof(inputString)+1);
-			strcat(inputString, buttonText);
-
-			inputStringIndex += strlen(buttonText);
-			printf("inputstringindex => %d\n", inputStringIndex);
-		}
-		else
-		{
-			printf("error. already placed decimal point...\n");
-			//return;
-		}
-	}
-	else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
-			strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
-	{
-		printf("found +,-,/,*\n");
-
-		char previousChar = inputString[inputStringIndex];
-		printf("comparing char=> %c",previousChar);
-		//check that operator is not placed twice in a row
-		if((previousChar == '+' && strcmp(buttonText, "+") == 0) ||
-				(previousChar == '-' && strcmp(buttonText, "-") == 0) ||
-				(previousChar == '/' && strcmp(buttonText, "/") == 0) ||
-				(previousChar == '*' && strcmp(buttonText, "*") == 0))
-		{
-			//error cant do that mate
-			printf("Error. cannot have 2 operators in a row\n");
-			return;
-		}
-		else if((previousChar == '-' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"+") == 0)
-		{
-			inputString[inputStringIndex] = '+';
-			decimalPointPlaced = 0;
-
-		}
-		else if((previousChar == '+' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"-") == 0)
-		{
-			inputString[inputStringIndex] = '-';
-			decimalPointPlaced = 0;
-
-		}
-		else if((previousChar == '+' || previousChar == '-' || previousChar == '*') && strcmp(buttonText,"/") == 0)
-		{
-			inputString[inputStringIndex] = '/';
-			decimalPointPlaced = 0;
-
-		}
-		else if((previousChar == '+' || previousChar == '-' || previousChar == '/') && strcmp(buttonText,"*") == 0)
-		{
-			inputString[inputStringIndex] = '*';
-			decimalPointPlaced = 0;
-
-		}
-		else //add like normal
-		{
-			//go for it mate
-
-			decimalPointPlaced = 0;
-
-			inputString = realloc(inputString, sizeof(inputString)+1);
-			strcat(inputString, buttonText);
-
-			inputStringIndex += strlen(buttonText);
-			printf("inputstringindex => %d\n", inputStringIndex);
-
-		}
-	}
-	else if(strcmp(buttonText, "=") == 0)
-	{
-		char lastChar = inputString[inputStringIndex];
-		if(lastChar == '+' || lastChar ==  '-' || lastChar ==  '/' ||  lastChar == '*')
-		{
-			printf("Error. last character is an operator. cannot do equals yet\n");
-		}
-		else
-		{
-			double result = doEquals();
-			result ++;
-			strcpy(inputString,"0");
-
-			//cannot parse string if there is an operator at the end of string
-			//reset variables
-			//strcpy(inputString,result);
-			//todo get iplementation for double to string for output
-			//free(inputString);
-
-			firstTime = 1;
-			inputStringIndex = 0;
-			decimalPointPlaced = 0;
-			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-			BSP_LCD_FillRect(1, 1, 318, 78);
-			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-
-		}
-
-
-
-	}
-	else if(strcmp(buttonText, "clr") == 0)
-	{
-		printf("in clr with non empty string\n");
-		//reset variables
-		strcpy(inputString,"0");
-		//free(inputString);
-		firstTime = 1;
-		inputStringIndex = 0;
-		decimalPointPlaced = 0;
-		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-		BSP_LCD_FillRect(1, 1, 318, 78);
-		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-
-	}
-	else
-	{
-
-		printf("Hey you pressed a button that doesnt have implementation yet\n");
-	}
-
-
-
-
-
-
-	printf("Current String=> %s\n", inputString);
-}
-
-double doEquals()
-{
-	char* newString;
-	newString = malloc(sizeof(char) * 1);
-	strcpy(newString, "");  //init
-
-
-	printf("Fuck off parsing is kinda implemented yet\n");
-	char operators[2][2]= {{'*', '/'},{'+', '-'}};
-	for(int i = 0 ; i < 2; i++)
-	{
-		for(int j = 0 ; j<inputStringIndex + 1 ; j++ )
-		{
-			for(int k = 0 ; k< 2;k++)
-			{
-				if(operators[i][k] == inputString[j]){
-					printf("found operator %c\n" , inputString[j]);
-					int leftCounter = 1;
-					while(j-leftCounter >= 0 && !isOperator(inputString[j-leftCounter]))
-					{
-						leftCounter+=1;
-					}
-					int rightCounter = 1;
-					while(j+rightCounter < inputStringIndex + 1 && !isOperator(inputString[j+rightCounter]))
-					{
-						rightCounter+=1;
-					}
-					printf("Left%d, Right %d, j %d\n", leftCounter, rightCounter , j);
-
-
-					char* charToConcat = malloc(sizeof(char)); //free later
-					strcpy(charToConcat,"");
-
-					for(int posCounter =j-leftCounter+1 ; posCounter < j+rightCounter; posCounter++ )
-					{
-						char temp[1];
-						temp[0] = inputString[posCounter];
-						strcat(charToConcat,temp);
-
-
-						//charToConcat[0] = inputString[posCounter];
-						printf("charTOConcet ==%s \n",charToConcat );
-						//printf("new string %c\n", inputString[posCounter]);
-
-//						int length = strlen(newString);
-//						newString[length] = inputString[posCounter];
-
-
-
-						//printf("building newString == %s\n", newString);
-
-					}
-
-					newString = realloc(newString, sizeof(newString)+ sizeof(charToConcat));
-					strcat(newString, charToConcat);
-					free(charToConcat);
-
-
-					printf("newString == %s\n", newString);
-
-				}
-
-
-			}
-		}
-
-	}
-
-	return 1.0;
-}
-
-
-int isOperator(char input ){
-	if(input == '*' || input == '/' || input == '+' || input == '-'){
-		return 1;
-	}
-	return 0;
-}
-
-
-
 
 void CalculatorProcess(void)
 {
-  // STEPIEN: Assume horizontal display
-  //uint16_t linenum = 0;
+  //Assume horizontal display
 
   static uint8_t fingerTouching = 0;
   static uint8_t bounce = 0;
@@ -540,18 +139,7 @@ void CalculatorProcess(void)
 
 }
 
-
-int buttonHere(int x, int y, Button button)
-{
-	//returns the button id or -1
-	if(button.startX  < x &&
-			x < button.startX + button.width &&
-			button.startY  < y &&
-			y < button.startY + button.height)
-		return button.id;
-	else
-		return -1;
-}
+/**************************Button Methods********************************/
 
 Button buildButton(int x , int y, int w, int h, int id){
 	Button b;
@@ -565,6 +153,19 @@ Button buildButton(int x , int y, int w, int h, int id){
 
 	return b;
 }
+
+int buttonHere(int x, int y, Button button)
+{
+	//returns the button id or -1
+	if(button.startX  < x &&
+			x < button.startX + button.width &&
+			button.startY  < y &&
+			y < button.startY + button.height)
+		return button.id;
+	else
+		return -1;
+}
+
 
 void showButton(Button button){
 	BSP_LCD_DrawRect(button.startX, button.startY, button.width, button.height);
@@ -581,5 +182,272 @@ void buttonToString(Button button)
 	printf("Button height: %d\n", button.height);
 	printf("Button text: %s\n", button.text);
 	printf("Button id: %d\n", button.id);
+}
+
+
+/************************************************************************/
+
+void analyseTouch(Button currentButtonPressed)
+{
+	//https://stackoverflow.com/a/6161123
+	if(firstTime == 1)
+	{
+		inputString = malloc(sizeof(char) * 1);
+		strcpy(inputString, "0");  //init
+
+
+		//printf("input string starts with %s", inputString);
+		firstTime = 0;
+	}
+
+	int buttonId = currentButtonPressed.id;
+
+	printf("Button id is: %d\n", buttonId);
+
+	char* buttonText = currentButtonPressed.text;
+	printf("Button to text is %s\n\n", buttonText);
+//
+//	printf("sizeof inputstring %d\n", sizeof(inputString));
+//	printf("strlen inputString %d\n\n", strlen(inputString));
+
+	if(strlen(inputString) == 1 && inputString[0] == '0') //Length 1 and only "0"
+	{
+		//blank string
+		printf("Recognised strlen of 1 and only a 0\n");
+
+		if(strcmp(buttonText,"0") == 0)
+		{
+			printf("0 was entered. Nothing to achieve on blank string\n");
+			//return;
+		}
+		if(strcmp(buttonText, "=") == 0)
+		{
+			printf("= was entered. Nothing to achieve on blank string\n");
+			//return;
+		}
+		if(strcmp(buttonText, "clr") == 0)
+		{
+			printf("clr was entered. Nothing to achieve on blank string\n");
+			//return;
+		}
+		if(strcmp(buttonText, "1") == 0 ||strcmp(buttonText, "2") == 0 || strcmp(buttonText, "3") == 0 ||
+				strcmp(buttonText, "4") == 0 ||strcmp(buttonText, "5") == 0 || strcmp(buttonText, "6") == 0 ||
+				strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 || strcmp(buttonText, "9") == 0)
+		{
+			//replace current "0" with another number
+			printf("found %s. replacing current 0\n", buttonText);
+			strcpy(inputString, buttonText);
+		}
+
+		if(strcmp(buttonText, ".") == 0)
+		{
+			concatenateButtonText(buttonText);
+			decimalPointPlaced = 1;
+
+
+		}
+		if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
+				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
+		{
+			concatenateButtonText(buttonText);
+		}
+
+	}
+	else if(strcmp(buttonText, "0") == 0 || strcmp(buttonText, "1") == 0 || strcmp(buttonText, "2") == 0 ||
+			strcmp(buttonText, "3") == 0 || strcmp(buttonText, "4") == 0 || strcmp(buttonText, "5") == 0 ||
+			strcmp(buttonText, "6") == 0 || strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 ||
+			strcmp(buttonText, "9") == 0)
+	{
+		//append to end of string
+		concatenateButtonText(buttonText);
+	}
+	else if(strcmp(buttonText, ".") == 0)
+	{
+		//make sure there isnt a decimal point already placed
+		if(decimalPointPlaced == 0)
+		{
+			//go for it
+			concatenateButtonText(buttonText);
+			decimalPointPlaced = 1;
+		}
+		else
+		{
+			printf("error. already placed decimal point...\n");
+			//return;
+		}
+	}
+	else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
+			strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
+	{
+		printf("found +,-,/,*\n");
+
+		char previousChar = inputString[inputStringIndex];
+		printf("comparing char=> %c",previousChar);
+		//check that operator is not placed twice in a row
+		if((previousChar == '+' && strcmp(buttonText, "+") == 0) ||
+				(previousChar == '-' && strcmp(buttonText, "-") == 0) ||
+				(previousChar == '/' && strcmp(buttonText, "/") == 0) ||
+				(previousChar == '*' && strcmp(buttonText, "*") == 0))
+		{
+			//error cant do that mate
+			printf("Error. cannot have 2 operators in a row\n");
+			return;
+		}
+		//if previous char is operator and new char is operator
+		//replace old operator with new operator
+		else if((previousChar == '-' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"+") == 0)
+		{
+			inputString[inputStringIndex] = '+';
+			decimalPointPlaced = 0;
+
+		}
+		else if((previousChar == '+' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"-") == 0)
+		{
+			inputString[inputStringIndex] = '-';
+			decimalPointPlaced = 0;
+
+		}
+		else if((previousChar == '+' || previousChar == '-' || previousChar == '*') && strcmp(buttonText,"/") == 0)
+		{
+			inputString[inputStringIndex] = '/';
+			decimalPointPlaced = 0;
+
+		}
+		else if((previousChar == '+' || previousChar == '-' || previousChar == '/') && strcmp(buttonText,"*") == 0)
+		{
+			inputString[inputStringIndex] = '*';
+			decimalPointPlaced = 0;
+
+		}
+		//todo missing functionality for pow, mod sqrt etc.
+		else //add like normal
+		{
+			//last char was not an operator
+			//append new operator to string
+			//go for it mate
+			concatenateButtonText(buttonText);
+			decimalPointPlaced = 0;
+
+		}
+	}
+	else if(strcmp(buttonText, "=") == 0)
+	{
+		//cannot parse string if there is an operator at the end of string
+		char lastChar = inputString[inputStringIndex];
+		if(lastChar == '+' || lastChar ==  '-' || lastChar ==  '/' ||  lastChar == '*')
+		{
+			printf("Error. last character is an operator. cannot do equals yet\n");
+		}
+		else
+		{
+			double result = doEquals(); //todo get iplementation for double to string for output
+			result ++; //todo not relevant, must be removed before submission
+			strcpy(inputString,"0");
+
+			//reset variables
+
+			firstTime = 1;
+			inputStringIndex = 0;
+			decimalPointPlaced = 0;
+			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+			BSP_LCD_FillRect(1, 1, 318, 78);
+			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+		}
+	}
+	else if(strcmp(buttonText, "clr") == 0)
+	{
+		printf("in clr with non empty string\n");
+		//reset variables
+		strcpy(inputString,"0");
+		//free(inputString);
+		firstTime = 1;
+		inputStringIndex = 0;
+		decimalPointPlaced = 0;
+		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+		BSP_LCD_FillRect(1, 1, 318, 78);
+		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
+	}
+	else
+	{
+		printf("Hey you pressed a button that doesnt have implementation yet\n");
+	}
+
+	printf("Current String=> %s\n", inputString);
+}
+
+void concatenateButtonText(char* buttonText)
+{
+	inputString = realloc(inputString, sizeof(inputString)+1);
+	strcat(inputString, buttonText);
+
+	inputStringIndex += strlen(buttonText);
+	printf("inputstringindex => %d\n", inputStringIndex);
+
+}
+
+double doEquals()
+{
+	char* newString;
+	newString = malloc(sizeof(char) * 1);
+	strcpy(newString, "");  //init
+
+
+	printf("Fuck off parsing is kinda implemented\n");
+	char operators[2][2]= {{'*', '/'},{'+', '-'}};
+	for(int i = 0 ; i < 2; i++)
+	{
+		for(int j = 0 ; j<inputStringIndex + 1 ; j++ )
+		{
+			for(int k = 0 ; k< 2;k++)
+			{
+				if(operators[i][k] == inputString[j]){
+					printf("found operator %c\n" , inputString[j]);
+					int leftCounter = 1;
+					while(j-leftCounter >= 0 && !isOperator(inputString[j-leftCounter]))
+					{
+						leftCounter+=1;
+					}
+					int rightCounter = 1;
+					while(j+rightCounter < inputStringIndex + 1 && !isOperator(inputString[j+rightCounter]))
+					{
+						rightCounter+=1;
+					}
+					printf("Left%d, Right %d, j %d\n", leftCounter, rightCounter , j);
+
+
+					char* charToConcat = malloc(sizeof(char)); //free later
+					strcpy(charToConcat,"");
+
+					for(int posCounter =j-leftCounter+1 ; posCounter < j+rightCounter; posCounter++ )
+					{
+						//make temp char array of size 1
+						//todo may need to extend temp char array for items with length > 1
+						//todo or it'll be fine? because we are concatenating single chars to build the new string
+						//todo then from the new string we can derive what operation is being applied.
+						char temp[1];
+						temp[0] = inputString[posCounter];
+						strcat(charToConcat,temp);
+						printf("charTOConcet ==%s \n",charToConcat );
+					}
+
+					newString = realloc(newString, sizeof(newString)+ sizeof(charToConcat));
+					strcat(newString, charToConcat);
+					free(charToConcat);
+
+					printf("newString == %s\n", newString);
+				}
+			}
+		}
+	}
+
+	return 1.0; //todo wrong. replace with correct result
+}
+
+int isOperator(char input ){
+	if(input == '*' || input == '/' || input == '+' || input == '-'){
+		return 1;
+	}
+	return 0;
 }
 
