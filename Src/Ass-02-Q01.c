@@ -384,35 +384,43 @@ float divNumbers()
 
 void debugMode()
 {
-	if(wordCount < 2 || wordCount > 2)
+	if(wordCount < 2)
 	{
-		printf("Error. Debug command must take one argument. Seek help.\n");
+		printf("##Extended Functionality## \t\t Debug status => %d\n", debugOn);
+	}
+	else if(wordCount > 2)
+	{
+		printf("Error. Debug command must take zero or one argument. Seek help.\n");
 		return;
 	}
-
-	char * secondKeyword =  (array_of_words)[1];
-	if(secondKeyword[0] == 'o' && secondKeyword[1] == 'n' && secondKeyword[2] == '\0')
-	{
-		if(debugOn == 1)
-			printf("Debug is already on.\n");
-		else
-		{
-			debugOn = 1;
-			printf("Debug message will be displayed\n");
-		}
-	}
-	else if(secondKeyword[0] == 'o' && secondKeyword[1] == 'f' && secondKeyword[2] == 'f' && secondKeyword[3] == '\0')
-	{
-		if(debugOn == 0)
-			printf("Debug is already off.\n");
-		else
-		{
-			debugOn = 0;
-			printf("Debug message will not be displayed");
-		}
-	}
 	else
-		printf("Error. Not a valid input for debug keyword. Seek help.");
+	{
+		char * secondKeyword =  (array_of_words)[1];
+		if(secondKeyword[0] == 'o' && secondKeyword[1] == 'n' && secondKeyword[2] == '\0')
+		{
+			if(debugOn == 1)
+				printf("Debug is already on.\n");
+			else
+			{
+				debugOn = 1;
+				printf("Debug message will be displayed\n");
+			}
+		}
+		else if(secondKeyword[0] == 'o' && secondKeyword[1] == 'f' && secondKeyword[2] == 'f' && secondKeyword[3] == '\0')
+		{
+			if(debugOn == 0)
+				printf("Debug is already off.\n");
+			else
+			{
+				debugOn = 0;
+				printf("Debug message will not be displayed");
+			}
+		}
+		else
+			printf("Error. Not a valid input for debug keyword. Seek help.");
+	}
+
+
 }
 
 void helpDesk()
@@ -513,8 +521,6 @@ void CommandLineParserProcess(void)
       	if(debugOn == 1) printArrayOfWords();
       	analyseKeywords();
       	freeEverything();
-
-
 
   }
 #else
