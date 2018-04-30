@@ -114,6 +114,7 @@ void CalculatorInit(void);
 void CalculatorProcess(void);
 void analyseTouch(Button currentButtonPressed);
 double doEquals();
+int isOperator(char);
 
 //char* inputString = "0";
 char* inputString;
@@ -396,12 +397,82 @@ void analyseTouch(Button currentButtonPressed)
 
 double doEquals()
 {
-	printf("Fuck off parsing isnt implemented yet\n");
+	char* newString;
+	newString = malloc(sizeof(char) * 1);
+	strcpy(newString, "");  //init
+
+
+	printf("Fuck off parsing is kinda implemented yet\n");
+	char operators[2][2]= {{'*', '/'},{'+', '-'}};
+	for(int i = 0 ; i < 2; i++)
+	{
+		for(int j = 0 ; j<inputStringIndex + 1 ; j++ )
+		{
+			for(int k = 0 ; k< 2;k++)
+			{
+				if(operators[i][k] == inputString[j]){
+					printf("found operator %c\n" , inputString[j]);
+					int leftCounter = 1;
+					while(j-leftCounter >= 0 && !isOperator(inputString[j-leftCounter]))
+					{
+						leftCounter+=1;
+					}
+					int rightCounter = 1;
+					while(j+rightCounter < inputStringIndex + 1 && !isOperator(inputString[j+rightCounter]))
+					{
+						rightCounter+=1;
+					}
+					printf("Left%d, Right %d, j %d\n", leftCounter, rightCounter , j);
+
+
+					char* charToConcat = malloc(sizeof(char)); //free later
+					strcpy(charToConcat,"");
+
+					for(int posCounter =j-leftCounter+1 ; posCounter < j+rightCounter; posCounter++ )
+					{
+						char temp[1];
+						temp[0] = inputString[posCounter];
+						strcat(charToConcat,temp);
+
+
+						//charToConcat[0] = inputString[posCounter];
+						printf("charTOConcet ==%s \n",charToConcat );
+						//printf("new string %c\n", inputString[posCounter]);
+
+//						int length = strlen(newString);
+//						newString[length] = inputString[posCounter];
+
+
+
+						//printf("building newString == %s\n", newString);
+
+					}
+
+					newString = realloc(newString, sizeof(newString)+ sizeof(charToConcat));
+					strcat(newString, charToConcat);
+					free(charToConcat);
+
+
+					printf("newString == %s\n", newString);
+
+				}
+
+
+			}
+		}
+
+	}
+
 	return 1.0;
 }
 
 
-
+int isOperator(char input ){
+	if(input == '*' || input == '/' || input == '+' || input == '-'){
+		return 1;
+	}
+	return 0;
+}
 
 
 
