@@ -121,6 +121,60 @@ static int inputStringIndex = 0;
 static int decimalPointPlaced = 0;
 
 static int firstTime = 1;
+
+
+
+void CalculatorInit(void)
+{
+  // STEPIEN: Assume horizontal display
+
+  // Initialize and turn on LCD and calibrate the touch panel
+  BSP_LCD_Init();
+  BSP_LCD_DisplayOn();
+  BSP_TP_Init();
+
+  // Display welcome message
+  BSP_LCD_Clear(LCD_COLOR_WHITE);
+  BSP_LCD_SetFont(&Font12);
+  BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+  //BSP_LCD_DisplayStringAt(5,5, (uint8_t*)"ELEC3730 Assignment 2",LEFT_MODE);
+  //BSP_LCD_DisplayStringAt(5,20, (uint8_t*)"Calculator Example",LEFT_MODE);
+
+  printf("width = %d\n", (int)BSP_LCD_GetXSize());
+  printf("height = %d\n", (int)BSP_LCD_GetYSize());
+
+  //320 240
+    //initialise buttons for screen
+  //Button buttons[21]; //originally 20 buttons,extra NULL is added to array for termination
+  for(int i = 0 ; i < 5; i++)
+  {
+	  for(int j = 0 ; j < 4 ;j++)
+	  {
+		  buttons[j * 5 + i] = buildButton(64* i, 80 + 40*j, 64,40,j* 5 + i);
+		  showButton(buttons[j*5+i]);
+		  buttonToString(buttons[j*5+i]);
+	  }
+  }
+
+  BSP_LCD_DisplayStringAt(20,40,"0" ,LEFT_MODE);
+
+
+//  // Create colour choices
+//  BSP_LCD_SetTextColor(LCD_COLOR_RED);
+//  BSP_LCD_FillRect(5, 200, 30, 30);
+//  BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+//  BSP_LCD_SetFont(&Font24);
+//  BSP_LCD_DisplayChar(290, 205, 'C');
+//  BSP_LCD_DrawHLine(  0, 196, 320);
+//  BSP_LCD_DrawVLine(  1, 198,  35);
+//	BSP_LCD_SetTextColor(LCD_COLOR_ORANGE);
+
+
+}
+
+
+
+
 void analyseTouch(Button currentButtonPressed)
 {
 	//https://stackoverflow.com/a/6161123
@@ -303,6 +357,10 @@ void analyseTouch(Button currentButtonPressed)
 			firstTime = 1;
 			inputStringIndex = 0;
 			decimalPointPlaced = 0;
+			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+			BSP_LCD_FillRect(1, 1, 318, 78);
+			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
 		}
 
 
@@ -317,6 +375,10 @@ void analyseTouch(Button currentButtonPressed)
 		firstTime = 1;
 		inputStringIndex = 0;
 		decimalPointPlaced = 0;
+		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+		BSP_LCD_FillRect(1, 1, 318, 78);
+		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
 	}
 	else
 	{
@@ -341,53 +403,6 @@ double doEquals()
 
 
 
-
-
-void CalculatorInit(void)
-{
-  // STEPIEN: Assume horizontal display
-
-  // Initialize and turn on LCD and calibrate the touch panel
-  BSP_LCD_Init();
-  BSP_LCD_DisplayOn();
-  BSP_TP_Init();
-
-  // Display welcome message
-  BSP_LCD_Clear(LCD_COLOR_WHITE);
-  BSP_LCD_SetFont(&Font12);
-  BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-  //BSP_LCD_DisplayStringAt(5,5, (uint8_t*)"ELEC3730 Assignment 2",LEFT_MODE);
-  //BSP_LCD_DisplayStringAt(5,20, (uint8_t*)"Calculator Example",LEFT_MODE);
-
-  printf("width = %d\n", (int)BSP_LCD_GetXSize());
-  printf("height = %d\n", (int)BSP_LCD_GetYSize());
-
-  //320 240
-    //initialise buttons for screen
-  //Button buttons[21]; //originally 20 buttons,extra NULL is added to array for termination
-  for(int i = 0 ; i < 5; i++)
-  {
-	  for(int j = 0 ; j < 4 ;j++)
-	  {
-		  buttons[j * 5 + i] = buildButton(64* i, 80 + 40*j, 64,40,j* 5 + i);
-		  showButton(buttons[j*5+i]);
-		  buttonToString(buttons[j*5+i]);
-	  }
-  }
-
-
-//  // Create colour choices
-//  BSP_LCD_SetTextColor(LCD_COLOR_RED);
-//  BSP_LCD_FillRect(5, 200, 30, 30);
-//  BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-//  BSP_LCD_SetFont(&Font24);
-//  BSP_LCD_DisplayChar(290, 205, 'C');
-//  BSP_LCD_DrawHLine(  0, 196, 320);
-//  BSP_LCD_DrawVLine(  1, 198,  35);
-//	BSP_LCD_SetTextColor(LCD_COLOR_ORANGE);
-
-
-}
 
 
 
@@ -433,6 +448,7 @@ void CalculatorProcess(void)
 	      if(currentButtonPressed.id != 999)
 	    	  analyseTouch(currentButtonPressed);
 
+	      	  BSP_LCD_DisplayStringAt(20,40,inputString ,LEFT_MODE);
 
 
 
@@ -451,7 +467,6 @@ void CalculatorProcess(void)
 
   }
 
-  //todo implement debouncing - busy waiting doesnt fucking work
 }
 
 
