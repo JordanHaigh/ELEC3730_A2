@@ -4,6 +4,8 @@
 
 #include "Ass-02.h"
 #include <math.h>
+#include <stdlib.h>
+
 
 #ifdef STM32F407xx
 #include "usart.h"
@@ -129,7 +131,8 @@ void validateAndRunRoot(uint8_t flag)
 
 float squareRoot()
 {
-	return sqrtf(atof(array_of_words[1]));
+	float result = atof(array_of_words[1]);
+	return sqrtf(result);
 }
 
 float cubeRoot()
@@ -320,7 +323,7 @@ void validateMultiplication()
 
 float mulNumbers()
 {
-	float currentMul;
+	float currentMul = 0;
 	uint8_t firstTime = 1;
 	for(int i = 1; i < wordCount; i++)
 	{
@@ -485,35 +488,38 @@ void CommandLineParserProcess(void)
 #ifdef STM32F407xx
   if (HAL_UART_Receive(&huart2, &c, 1, 0x0) == HAL_OK) //code for running through stm board
   {
-    printf("SERIAL: Got '%c'\n", c);
     HAL_GPIO_TogglePin(GPIOD, LD4_Pin); // Toggle LED4
 
-    // STEPIEN: The following is some test code that can be removed
-    //
-    //todo remove later and replace with functioning stm code
+    	char c;
+    	int i;
+        char command_line[101];
 
-    {
-      int c;
-      char si[]="1234";
-      int i=111;
-      char sf[]="r5b6c7d8";
-      float f=2.22;
+    	// Get one line of input
+    	printf("--> Question 1 - Enter text:\n");
+    	i=0;
+    	c=getchar();
+    	while (c != 13 && i < 100)
+    	{
+    		printf("%c",c);
+    		command_line[i]=c;
+    		i++;
+    	    c=getchar();
+    	}
+    	printf("\n");
+    	command_line[i]=0;
 
-      printf("TEST: Float printf() test: %f\n", 1.234);
-      sscanf(si, "%d", &i);
-      c=sscanf(sf, "%f", &f);
-      printf("TEST: Input string : '%s'\n", si);
-      printf("TEST: Input int    : %d\n", i);
-      printf("TEST: Input string : '%s'\n", sf);
-      printf("TEST: Input float  : %f\n", f);
-      printf("TEST: c=%d\n",c);
-    }
+    	// Parse the input and print result
+      	wordCount = string_parser(command_line, &array_of_words);
+      	if(debugOn == 1) printArrayOfWords();
+      	analyseKeywords();
+      	freeEverything();
+
+
+
   }
 #else
   c = getchar();
-
   //printf("SERIAL: Got '%c' or in ascii '%d'\n", c,c);
-
   buildInputString(c);
 
 #endif
