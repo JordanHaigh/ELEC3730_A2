@@ -39,7 +39,7 @@ double doEquals();
 int isOperator(char);
 int maxSize = 20;
 
-//char* compute(char operator,char* leftNum,char* rightNum);
+float compute(char operator,char* leftNum,char* rightNum);
 
 
 
@@ -456,9 +456,14 @@ double doEquals()
 					printf("rightNum %s\n", rightNum);
 					printf("leftNum %s\n\n", leftNum);
 
-//					char* result = compute(operators[i][k],leftNum,rightNum);
+					float result = compute(operators[i][k],leftNum,rightNum);
+					char* resultString;
+					snprintf(resultString, sizeof(float), "%f", result);
+					printf("result %f", result);
 //
-//					char* tempString;
+//					char* tempString = (char*)malloc();
+//
+//
 //					strncpy(tempString, &inputString[0], j-leftCounter+1);
 //					strcat(tempString, result);
 //					strcat(tempString,&inputString[j+rightCounter]);
@@ -466,8 +471,7 @@ double doEquals()
 //
 //
 //					strcpy(inputString, tempString);
-//					free(result);\
-
+					free(resultString);
 					free(leftNum);
 					free(rightNum);
 
@@ -501,33 +505,39 @@ double doEquals()
 	return 1.0; //todo wrong. replace with correct result
 }
 
-//
-//char* compute(char operator,char* leftNum,char* rightNum){
-//
-//	//todo use correct names for function
-//	float result;
-//	char* numbers[2] = {leftNum,rightNum};
-//	switch(operator){
-//	case '*':
-//		result = mulNumbers(2,numbers);
-//		break;
-//	case '/':
-//		result = divNumbers(2,numbers);
-//		break;
-//	case '+':
+
+float compute(char operator,char* leftNum,char* rightNum){
+
+	//todo use correct names for function
+	float result = 0;
+	char* numbers[2] = {leftNum,rightNum};
+	switch(operator){
+	case '*':
+		result = mulNumbers(2,numbers);
+		break;
+	case '/':
+		result = divNumbers(2,numbers);
+		break;
+	case '+':
+		printf("hi there\n");
+		result = atof(leftNum);
+		printf("leftNum %f\n",atof(leftNum));
+		printf("result -> %f\n", result);
+
+		result += atof(rightNum);
+		printf("result -> %f\n", result);
 //		result = addNumbers(2,numbers);
-//		break;
-//	case '-':
-//		result = subNumbers(2,numbers);
-//		break;
-//	}
-//
-//	char* output;
-//	snprintf(output, sizeof(float), "%f", result);
-//	return output;
-//
-//
-//}
+		break;
+	case '-':
+		result = subNumbers(2,numbers);
+		break;
+	}
+
+
+	return result;
+
+
+}
 
 
 int isOperator(char input ){
