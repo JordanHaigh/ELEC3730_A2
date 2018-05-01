@@ -418,6 +418,9 @@ double doEquals()
 //	printf("input string at equals 5 %s\n", inputString);
 
 	char operators[2][2]= {{'*', '/'},{'+', '-'}};
+	float finalResult = 0;
+	char resultString[64];
+
 //	printf("input string at equals 1 %s\n", inputString);
 
 	for(int i = 0 ; i < 2; i++)
@@ -462,14 +465,31 @@ double doEquals()
 					printf("leftNum %s\n\n", leftNum);
 
 					float result = compute(operators[i][k],leftNum,rightNum);
-					char* resultString;
-
-					resultString = (char*)malloc(sizeof(char) * maxSize);
+					finalResult += result;
 
 
-					strcpy(resultString,"");
-					snprintf(resultString, sizeof(float), "%f", result);
-					printf("result %f", result);
+					//need to replace the left, right and operator in current string
+					char* fixedString = (char*)malloc(sizeof(inputString));
+					snprintf(resultString, sizeof(resultString), "%f", result);
+					strcpy(fixedString, resultString);
+
+					size_t correctAllocationAmount = strlen(inputString) - (strlen(inputString) - (size_t)(leftNum - 1));
+					int a = (int)correctAllocationAmount;
+					char* substring = (char*)malloc(sizeof(char) * a);
+
+					strncpy(substring, substring+a,(int)strlen(substring));
+					substring[strlen(substring)] = '\0';
+
+					printf("substring is %s\n", substring);
+
+					//strcat(fixedString, ) //right counter +1 onwards...
+
+					//resultString = (char*)malloc(sizeof(char) * maxSize);
+					//strcpy(resultString,"");
+
+					//snprintf(resultString, sizeof(resultString), "%f", result);
+					//printf("result %f", result);
+					//printf("current string %s", resultString);
 //
 //					char* tempString = (char*)malloc();
 //
@@ -481,9 +501,10 @@ double doEquals()
 //
 //
 //					strcpy(inputString, tempString);
-					free(resultString);
+					//free(resultString);
 					free(leftNum);
 					free(rightNum);
+					free(substring);
 
 
 
@@ -511,6 +532,10 @@ double doEquals()
 			}
 		}
 	}
+
+	snprintf(resultString, sizeof(resultString), "%f", finalResult);
+	printf("Final result is %s", resultString);
+
 
 	return 1.0; //todo wrong. replace with correct result
 }
@@ -541,17 +566,19 @@ float compute(char operator,char* leftNum,char* rightNum){
 	char* numbers[3] = {NULL,leftNum,rightNum};
 	switch(operator){
 	case '*':
-		numbers[0] = "mul";
+		numbers[0] = commandList[2].nameString;
+		result = commandList[2].function_p(3,numbers);
 		//result = mulNumbers(3,numbers);//mul [left] [right].
 		break;
 	case '/':
-		numbers[0] = "div";
+		numbers[0] = commandList[3].nameString;
+		result = commandList[3].function_p(3,numbers);
 		//result = divNumbers(3,numbers);
 		break;
 	case '+':
-		numbers[0] = "add"; printf("about to add\n");
+		numbers[0] = commandList[0].nameString; //printf("about to add\n");
 		result = commandList[0].function_p(3,numbers);
-		printf("finished add\n");
+		//printf("finished add\n");
 
 //		result = atof(leftNum);
 //		printf("leftNum %f\n",atof(leftNum));
@@ -562,6 +589,8 @@ float compute(char operator,char* leftNum,char* rightNum){
 ////		result = addNumbers(2,numbers);
 		break;
 	case '-':
+		numbers[0] = commandList[1].nameString;
+		result = commandList[1].function_p(3,numbers);
 		//result = subNumbers(2,numbers);
 		break;
 	}
