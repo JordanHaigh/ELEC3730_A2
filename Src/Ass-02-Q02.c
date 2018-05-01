@@ -37,6 +37,8 @@ void buttonToString(Button button);
 void analyseTouch(Button currentButtonPressed);
 double doEquals();
 int isOperator(char);
+int maxSize = 20;
+
 //char* compute(char operator,char* leftNum,char* rightNum);
 
 
@@ -193,7 +195,7 @@ void analyseTouch(Button currentButtonPressed)
 	//https://stackoverflow.com/a/6161123
 	if(firstTime == 1)
 	{
-		inputString = malloc(sizeof(char) * 1);
+		inputString = (char*)malloc(sizeof(char) * maxSize);
 		strcpy(inputString, "0");  //init
 
 
@@ -381,9 +383,14 @@ void analyseTouch(Button currentButtonPressed)
 
 void concatenateButtonText(char* buttonText)
 {
-	inputString = realloc(inputString, sizeof(inputString)+1);
-	strcat(inputString, buttonText);
 
+
+	if(inputStringIndex + 3 >= maxSize){
+		maxSize *= 2;
+		inputString = (char*)realloc(inputString, maxSize*sizeof(char));
+	}
+//	inputString = realloc(inputString, (inputStringIndex + 2) * sizeof(char));
+	strcat(inputString, buttonText);
 	inputStringIndex += strlen(buttonText);
 	printf("inputstringindex => %d\n", inputStringIndex);
 
@@ -391,13 +398,23 @@ void concatenateButtonText(char* buttonText)
 
 double doEquals()
 {
+//	printf("input string at equals %s\n", inputString);
 	char* newString;
+//	printf("input string at equals 2 %s\n", inputString);
+
 	newString = malloc(sizeof(char) * 1);
+//	printf("input string at equals 3 %s\n", inputString);
+
 	strcpy(newString, "");  //init
+//	printf("input string at equals 4 %s\n", inputString);
 
 
 	printf("Parsing is kinda implemented\n");
+//	printf("input string at equals 5 %s\n", inputString);
+
 	char operators[2][2]= {{'*', '/'},{'+', '-'}};
+//	printf("input string at equals 1 %s\n", inputString);
+
 	for(int i = 0 ; i < 2; i++)
 	{
 		for(int j = 0 ; j<inputStringIndex + 1 ; j++ )
@@ -405,18 +422,27 @@ double doEquals()
 			for(int k = 0 ; k< 2;k++)
 			{
 				if(operators[i][k] == inputString[j]){
+//					printf("input string at 1 %s\n", inputString);
+
 					printf("found operator %c\n" , inputString[j]);
 					int leftCounter = 1;
 					while(j-leftCounter >= 0 && !isOperator(inputString[j-leftCounter]))
 					{
 						leftCounter+=1;
 					}
+//					printf("input string at 2 %s", inputString);
+
 					int rightCounter = 1;
 					while(j+rightCounter < inputStringIndex + 1 && !isOperator(inputString[j+rightCounter]))
 					{
 						rightCounter+=1;
 					}
+//					printf("input string at 3 %s", inputString);
+
 					printf("Left%d, Right %d, j %d\n", leftCounter, rightCounter , j);
+
+
+//					printf("inputString before %s\n", inputString);
 
 
 
@@ -428,7 +454,7 @@ double doEquals()
 					strncat(rightNum, &inputString[j +1], rightCounter -1);
 					printf("inputString %s\n", inputString);
 					printf("rightNum %s\n", rightNum);
-					printf("leftNum %s\n", leftNum);
+					printf("leftNum %s\n\n", leftNum);
 
 //					char* result = compute(operators[i][k],leftNum,rightNum);
 //
@@ -442,8 +468,8 @@ double doEquals()
 //					strcpy(inputString, tempString);
 //					free(result);\
 
-//					free(leftNum);
-//					free(rightNum);
+					free(leftNum);
+					free(rightNum);
 
 
 
