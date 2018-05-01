@@ -3,6 +3,7 @@
 //   $Author: Peter $
 
 #include "Ass-02.h"
+//#include "Ass-02-Q01.c"
 #include <stdlib.h>
 
 typedef struct {
@@ -36,6 +37,7 @@ void showButton(Button button);
 void buttonToString(Button button);
 
 void analyseTouch(Button currentButtonPressed);
+void concatenateButtonText(char* buttonText);
 double doEquals();
 int isOperator(char);
 int maxSize = 20;
@@ -459,6 +461,7 @@ double doEquals()
 
 					float result = compute(operators[i][k],leftNum,rightNum);
 					char* resultString;
+					strcpy(resultString,"");
 					snprintf(resultString, sizeof(float), "%f", result);
 					printf("result %f", result);
 //
@@ -508,28 +511,51 @@ double doEquals()
 
 
 float compute(char operator,char* leftNum,char* rightNum){
+	/**
+	*	Used as reference to commandList[]
+	*
+	*   {"add",  &validateAddition, "add <num 1> .. <num N>\n"},
+	*	{"sub",  &validateSubtraction, "sub <num 1> <num 2>\n"},
+	*	{"mul",  &validateMultiplication, "mul <num 1> .. <num N>\n"},
+	*	{"div",  &validateDivision, "div <num 1> <num 2>\n"},
+	*	{"sqrt", &validateSquareRoot, "sqrt <num1> : Finds the square root of a floating point number.\n"},
+	*	{"cbrt", &validateCubeRoot,"cbrt <num1> : Finds the cube root of a floating point number.\n"},
+	*	{"pow",  &validatePower,"pow <num1> <num2> : Finds the power of the num1 to the power of num2.\n"},
+	*	{"mod",  &validateModulo,"mod <num1> <num2>: Finds the modulo of two INTEGERS.\n"},
+	*	{"debug",&debugMode,"debug <on|off> : Turn debug messages on or off.\n"},
+	*	{"help", &helpDesk,"help [command] : Prints help information for a command\n"},
+	*	{NULL, NULL, NULL}
+	**/
+
+
+
 
 	//todo use correct names for function
 	float result = 0;
-	char* numbers[2] = {leftNum,rightNum};
+	char* numbers[3] = {NULL,leftNum,rightNum};
 	switch(operator){
 	case '*':
-		result = mulNumbers(2,numbers);
+		numbers[0] = "mul";
+		//result = mulNumbers(3,numbers);//mul [left] [right].
 		break;
 	case '/':
-		result = divNumbers(2,numbers);
+		numbers[0] = "div";
+		//result = divNumbers(3,numbers);
 		break;
 	case '+':
-		result = atof(leftNum);
-		printf("leftNum %f\n",atof(leftNum));
-		printf("result -> %f\n", result);
+		numbers[0] = "add";
+		//result = commandList[0].function_p(3,numbers);
 
-		result += atof(rightNum);
-		printf("result -> %f\n", result);
-//		result = addNumbers(2,numbers);
+//		result = atof(leftNum);
+//		printf("leftNum %f\n",atof(leftNum));
+//		printf("result -> %f\n", result);
+//
+//		result += atof(rightNum);
+//		printf("result -> %f\n", result);
+////		result = addNumbers(2,numbers);
 		break;
 	case '-':
-		result = subNumbers(2,numbers);
+		//result = subNumbers(2,numbers);
 		break;
 	}
 
