@@ -3,6 +3,7 @@
 //   $Author: Peter $
 
 #include "Ass-02.h"
+#include <stdlib.h>
 
 typedef struct {
 	  int startX;
@@ -519,7 +520,6 @@ float compute(char operator,char* leftNum,char* rightNum){
 		result = divNumbers(2,numbers);
 		break;
 	case '+':
-		printf("hi there\n");
 		result = atof(leftNum);
 		printf("leftNum %f\n",atof(leftNum));
 		printf("result -> %f\n", result);
