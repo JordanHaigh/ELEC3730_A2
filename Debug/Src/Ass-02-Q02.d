@@ -32,7 +32,8 @@ Src/Ass-02-Q02.o: ../Src/Ass-02-Q02.c ../Src/Ass-02.h \
  u:\elec3730\jordanandevansharedworkspacefolder\elec3730-2018s1-ass-02-stm32-r1234\ass-02-stm32\drivers\bsp\ili9325.h \
  u:\elec3730\jordanandevansharedworkspacefolder\elec3730-2018s1-ass-02-stm32-r1234\ass-02-stm32\drivers\bsp\lcd.h \
  u:\elec3730\jordanandevansharedworkspacefolder\elec3730-2018s1-ass-02-stm32-r1234\ass-02-stm32\drivers\fonts\fonts.h \
- U:/ELEC3730/jordanandevansharedworkspacefolder/ELEC3730-2018s1-Ass-02-STM32-r1234/Ass-02-STM32/Drivers/BSP/touch_panel.h
+ U:/ELEC3730/jordanandevansharedworkspacefolder/ELEC3730-2018s1-Ass-02-STM32-r1234/Ass-02-STM32/Drivers/BSP/touch_panel.h \
+ ../Src/Ass-02-Q01.h
 
 ../Src/Ass-02.h:
 
@@ -103,3 +104,5 @@ u:\elec3730\jordanandevansharedworkspacefolder\elec3730-2018s1-ass-02-stm32-r123
 u:\elec3730\jordanandevansharedworkspacefolder\elec3730-2018s1-ass-02-stm32-r1234\ass-02-stm32\drivers\fonts\fonts.h:
 
 U:/ELEC3730/jordanandevansharedworkspacefolder/ELEC3730-2018s1-Ass-02-STM32-r1234/Ass-02-STM32/Drivers/BSP/touch_panel.h:
+
+../Src/Ass-02-Q01.h:

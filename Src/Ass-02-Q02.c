@@ -3,7 +3,9 @@
 //   $Author: Peter $
 
 #include "Ass-02.h"
-//#include "Ass-02-Q01.c"
+
+#include "Ass-02-Q01.h"
+
 #include <stdlib.h>
 
 typedef struct {
@@ -461,6 +463,10 @@ double doEquals()
 
 					float result = compute(operators[i][k],leftNum,rightNum);
 					char* resultString;
+
+					resultString = (char*)malloc(sizeof(char) * maxSize);
+
+
 					strcpy(resultString,"");
 					snprintf(resultString, sizeof(float), "%f", result);
 					printf("result %f", result);
@@ -543,8 +549,9 @@ float compute(char operator,char* leftNum,char* rightNum){
 		//result = divNumbers(3,numbers);
 		break;
 	case '+':
-		numbers[0] = "add";
-		//result = commandList[0].function_p(3,numbers);
+		numbers[0] = "add"; printf("about to add\n");
+		result = commandList[0].function_p(3,numbers);
+		printf("finished add\n");
 
 //		result = atof(leftNum);
 //		printf("leftNum %f\n",atof(leftNum));
