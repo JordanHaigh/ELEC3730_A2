@@ -37,7 +37,7 @@ void buttonToString(Button button);
 void analyseTouch(Button currentButtonPressed);
 double doEquals();
 int isOperator(char);
-char* compute(char operator,char* leftNum,char* rightNum);
+//char* compute(char operator,char* leftNum,char* rightNum);
 
 
 
@@ -420,27 +420,30 @@ double doEquals()
 
 
 
-					char* leftNum = malloc(sizeof(char)* (leftCounter-1));
-					strncpy(leftNum, &inputString[j-leftCounter+1], leftCounter -1);
-					char* rightNum = malloc(sizeof(char)* (rightCounter-1));
-					strncpy(rightNum, &inputString[j +1], rightCounter -1);
-
-					printf("rightNum %s\n", rightNum );
+					char* leftNum = malloc(sizeof(char) * (leftCounter-1));
+					strcpy(leftNum, "");  //init
+					strncat(leftNum, &inputString[j-leftCounter+1], leftCounter -1);
+					char* rightNum = malloc(sizeof(char) * (rightCounter-1));
+					strcpy(rightNum, "");  //init
+					strncat(rightNum, &inputString[j +1], rightCounter -1);
+					printf("inputString %s\n", inputString);
+					printf("rightNum %s\n", rightNum);
 					printf("leftNum %s\n", leftNum);
 
-					char* result = compute(operators[i][k],leftNum,rightNum);
+//					char* result = compute(operators[i][k],leftNum,rightNum);
+//
+//					char* tempString;
+//					strncpy(tempString, &inputString[0], j-leftCounter+1);
+//					strcat(tempString, result);
+//					strcat(tempString,&inputString[j+rightCounter]);
+//					printf("after computation %s",tempString);
+//
+//
+//					strcpy(inputString, tempString);
+//					free(result);\
 
-					char* tempString;
-					strncpy(tempString, &inputString[0], j-leftCounter+1);
-					strcat(tempString, result);
-					strcat(tempString,&inputString[j+rightCounter]);
-					printf("after computation %s",tempString);
-
-
-					strcpy(inputString, tempString);
-					free(result);
-					free(leftNum);
-					free(rightNum);
+//					free(leftNum);
+//					free(rightNum);
 
 
 
@@ -472,30 +475,33 @@ double doEquals()
 	return 1.0; //todo wrong. replace with correct result
 }
 
-
-char* compute(char operator,char* leftNum,char* rightNum){
-
-	//todo use correct names for function
-	char* result;
-	switch(operator){
-	case '*':
-		result = mult(leftNum,rightNum);
-		break;
-	case '/':
-		result = div(leftNum,rightNum);
-		break;
-	case '+':
-		result = add(leftNum,rightNum);
-		break;
-	case '-':
-		result = sub(leftNum,rightNum);
-		break;
-	}
-	return result;
-
-
-
-}
+//
+//char* compute(char operator,char* leftNum,char* rightNum){
+//
+//	//todo use correct names for function
+//	float result;
+//	char* numbers[2] = {leftNum,rightNum};
+//	switch(operator){
+//	case '*':
+//		result = mulNumbers(2,numbers);
+//		break;
+//	case '/':
+//		result = divNumbers(2,numbers);
+//		break;
+//	case '+':
+//		result = addNumbers(2,numbers);
+//		break;
+//	case '-':
+//		result = subNumbers(2,numbers);
+//		break;
+//	}
+//
+//	char* output;
+//	snprintf(output, sizeof(float), "%f", result);
+//	return output;
+//
+//
+//}
 
 
 int isOperator(char input ){

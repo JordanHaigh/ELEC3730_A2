@@ -35,26 +35,30 @@ void printArrayOfWords()
 
 void buildInputString(uint8_t c);
 int string_parser(char *inp, char **array_of_words_p[]);
-void analyseKeywords();
+void analyseKeywords(uint8_t argNum, char* argStrings[]);
 void freeEverything()
 {
 	free(newString);
 	free(array_of_words);
 }
-uint8_t checkForNumericArgument(uint8_t processingIntegerFlag);
-uint8_t checkArgumentLength(uint8_t flag, uint8_t expectedWordCount);
 
-void validateAddition();
-float addNumbers();
-void validateSubtraction();
-float subNumbers();
-void validateMultiplication();
-float mulNumbers();
-void validateDivision();
-float divNumbers();
+uint8_t checkArgumentLength(uint8_t, uint8_t);
+uint8_t checkArgumentLength2(uint8_t flag, uint8_t expectedWordCount, uint8_t argNum);
 
-void debugMode();
-void helpDesk();
+uint8_t checkForNumericArgument(uint8_t);
+uint8_t checkForNumericArgument2(uint8_t processingIntegerFlag, uint8_t argNum, char* argStrings[]);
+
+void validateAddition(uint8_t argNum, char *ArgStrings[]);
+float addNumbers(uint8_t argNum, char *ArgStrings[]);
+void validateSubtraction(uint8_t argNum, char* argStrings[]);
+float subNumbers(uint8_t argNum, char* argStrings[]);
+void validateMultiplication(uint8_t argNum, char* argStrings[]);
+float mulNumbers(uint8_t argNum, char* argStrings[]);
+void validateDivision(uint8_t argNum, char* argStrings[]);
+float divNumbers(uint8_t argNum, char* argStrings[]);
+
+void debugMode(uint8_t argNum, char* argStrings[]);
+void helpDesk(uint8_t argNum, char* argStrings[]);
 
 void validateAndRunRoot(uint8_t flag);
 float squareRoot();
@@ -67,30 +71,30 @@ int modulo();
 
 
 
-void analyseKeywords()
+void analyseKeywords(uint8_t argNum, char* argStrings[])
 {
 
-	if(wordCount == 0)
+	if(argNum == 0)
 	{
 		printf("Error. No input. Seek help.\n");
 		return;
 	}
 
-	char* firstKeyword  = (array_of_words)[0];
+	char* firstKeyword  = (argStrings)[0];
 
 	//must be either add,sub,mul,div
 	if(firstKeyword[0] == 'a' && firstKeyword[1] == 'd' && firstKeyword[2] == 'd' && firstKeyword[3] == '\0')
-		validateAddition();
+		validateAddition(argNum, argStrings);
 	else if(firstKeyword[0] == 's' && firstKeyword[1] == 'u' && firstKeyword[2] == 'b' && firstKeyword[3] == '\0')
-		validateSubtraction();
+		validateSubtraction(argNum, argStrings);
 	else if(firstKeyword[0] == 'm' && firstKeyword[1] == 'u' && firstKeyword[2] == 'l' && firstKeyword[3] == '\0')
-		validateMultiplication();
+		validateMultiplication(argNum, argStrings);
 	else if(firstKeyword[0] == 'd' && firstKeyword[1] == 'i' && firstKeyword[2] == 'v' && firstKeyword[3] == '\0')
-		validateDivision();
+		validateDivision(argNum, argStrings);
 	else if(firstKeyword[0] == 'h' && firstKeyword[1] == 'e' && firstKeyword[2] == 'l' && firstKeyword[3] == 'p' && firstKeyword[4] == '\0')
-			helpDesk();
+			helpDesk(argNum, argStrings);
 	else if(firstKeyword[0] == 'd' && firstKeyword[1] == 'e' && firstKeyword[2] == 'b' && firstKeyword[3] == 'u' && firstKeyword[4] == 'g' && firstKeyword[5] == '\0')
-		debugMode();
+		debugMode(argNum, argStrings);
 
 
 
@@ -182,6 +186,24 @@ int modulo()
 	return (int)atof(array_of_words[1]) % (int)atof(array_of_words[2]);
 }
 
+uint8_t checkArgumentLength2(uint8_t flag, uint8_t expectedWordCount, uint8_t argNum)
+{
+	if(argNum == 1)
+		return 0;
+
+	if(flag == 0) //used for addition and subtraction. N number of arguments supported
+		return 1;
+	else //flag must be 1. flag is used in the operations where a number of arguments is specified, i.e sub, div, sqrt, sbrt, mod, pow
+	{
+		if(argNum < expectedWordCount || argNum > expectedWordCount)
+			return 0;
+		else
+			return 1;
+
+	}
+}
+
+//todo delete before submission
 uint8_t checkArgumentLength(uint8_t flag, uint8_t expectedWordCount)
 {
 	if(wordCount == 1)
@@ -202,6 +224,48 @@ uint8_t checkArgumentLength(uint8_t flag, uint8_t expectedWordCount)
 
 
 
+uint8_t checkForNumericArgument2(uint8_t processingIntegerFlag, uint8_t argNum, char *argStrings[])
+{
+	uint8_t foundDecimalPoint = 0;
+
+	for(int i = 1; i < argNum; i++)
+	{
+
+		for(int j = 0; argStrings[i][j] != '\0'; j++) //check each letter in the word
+		{
+			if(argStrings[i][j] == '.')
+			{ //searching for decimal point
+
+				if(foundDecimalPoint == 0)
+					foundDecimalPoint = 1;
+				else
+				{
+					printf("Error. Not a valid input\n");
+					return 0;
+				}
+			}
+
+			else if(!(argStrings[i][j] >= 48 && argStrings[i][j] <= 57)) //if the number is not within 0-9 (non numeric)
+			{
+				printf("Error. Not a valid input\n");
+				return 0;
+			}
+
+			else if(processingIntegerFlag == 1 && foundDecimalPoint == 1 && (argStrings[i][j] >= 48 && argStrings[i][j] <= 57)) //if a decimal point is found and numerals trail it, it must be a decimal
+			{
+				printf("Error. Not a valid Input\n");
+				return 0;
+			}
+
+		}
+		//new word, reset decimal point
+		foundDecimalPoint = 0;
+	}
+
+	return 1;
+}
+
+//todo delete method
 uint8_t checkForNumericArgument(uint8_t processingIntegerFlag)
 {
 	uint8_t foundDecimalPoint = 0;
@@ -243,55 +307,55 @@ uint8_t checkForNumericArgument(uint8_t processingIntegerFlag)
 	return 1;
 }
 
-void validateAddition()
+void validateAddition(uint8_t argNum, char *argStrings[])
 {
-	if(checkArgumentLength(0,99) == 0)
+	if(checkArgumentLength2(0,99, argNum) == 0)
 		printf("Error. Must contain one or more numbers for addition.\n");
 	else
 	{
-		if(checkForNumericArgument(0) == 1)
+		if(checkForNumericArgument2(0, argNum, argStrings) == 1)
 		{
-			float result = addNumbers();
+			float result = addNumbers(argNum, argStrings);
 			printf("Result: %.2f\n", result);
 		}
 	}
 }
 
-float addNumbers()
+float addNumbers(uint8_t argNum, char* argStrings[])
 {
 
 	float currentSum = 0;
 
-	for(int i = 1; i < wordCount; i++)
+	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = atof(array_of_words[i]);
+		float stringToFloat = atof(argStrings[i]);
 		currentSum += stringToFloat;
 	}
 
 	return currentSum;
 }
 
-void validateSubtraction()
+void validateSubtraction(uint8_t argNum, char* argStrings[])
 {
-	if(checkArgumentLength(1,3) == 0)
+	if(checkArgumentLength2(1,3,argNum) == 0)
 		printf("Error. Must contain exactly two numbers for subtraction\n");
 	else
 	{
-		if(checkForNumericArgument(0) == 1)
+		if(checkForNumericArgument2(0, argNum, argStrings) == 1)
 		{
-			float result = subNumbers();
+			float result = subNumbers(argNum, argStrings);
 			printf("Result: %.2f\n", result);
 		}
 	}
 }
 
-float subNumbers()
+float subNumbers(uint8_t argNum, char* argStrings[])
 {
 	float currentSub = 0;
 	uint8_t firstRun = 1;
-	for(int i = 1; i < wordCount; i++)
+	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = atof((array_of_words)[i]);
+		float stringToFloat = atof((argStrings)[i]);
 
 		if(firstRun == 1)
 		{
@@ -306,28 +370,28 @@ float subNumbers()
 
 }
 
-void validateMultiplication()
+void validateMultiplication(uint8_t argNum, char* argStrings[])
 {
-	if(checkArgumentLength(0,99) == 0)
+	if(checkArgumentLength2(0,99, argNum) == 0)
 		printf("Error. Must contain one or more numbers for multiplication.\n");
 	else
 	{
-		if(checkForNumericArgument(0) == 1)
+		if(checkForNumericArgument2(0,argNum, argStrings) == 1)
 		{
-			float result = mulNumbers();
+			float result = mulNumbers(argNum, argStrings);
 			printf("Result: %.2f\n", result);
 		}
 
 	}
 }
 
-float mulNumbers()
+float mulNumbers(uint8_t argNum, char* argStrings[])
 {
 	float currentMul = 0;
 	uint8_t firstTime = 1;
-	for(int i = 1; i < wordCount; i++)
+	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = atof((array_of_words)[i]);
+		float stringToFloat = atof((argStrings)[i]);
 
 		if(firstTime)
 		{
@@ -342,27 +406,27 @@ float mulNumbers()
 	return currentMul;
 }
 
-void validateDivision()
+void validateDivision(uint8_t argNum, char* argStrings[])
 {
-	if(checkArgumentLength(1,3) == 0)
+	if(checkArgumentLength2(1,3, argNum) == 0)
 		printf("Error. Must contain exactly two numbers for division\n");
 	else
 	{
-		if(checkForNumericArgument(0) == 1)
+		if(checkForNumericArgument2(0, argNum, argStrings) == 1)
 		{
-			float result = divNumbers();
+			float result = divNumbers(argNum, argStrings);
 			printf("Result: %.2f\n", result);
 		}
 	}
 }
 
-float divNumbers()
+float divNumbers(uint8_t argNum, char* argStrings[])
 {
 	float currentDiv = 0;
 	uint8_t firstRun = 1;
-	for(int i = 1; i < wordCount; i++)
+	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = atof((array_of_words)[i]);
+		float stringToFloat = atof((argStrings)[i]);
 		if(stringToFloat == 0.0)
 		{
 			return 0.0; //it was always going to be a 0.0 result regardless
@@ -382,20 +446,20 @@ float divNumbers()
 }
 
 
-void debugMode()
+void debugMode(uint8_t argNum, char* argStrings[])
 {
-	if(wordCount < 2)
+	if(argNum < 2)
 	{
 		printf("##Extended Functionality## \t\t Debug status => %d\n", debugOn);
 	}
-	else if(wordCount > 2)
+	else if(argNum > 2)
 	{
 		printf("Error. Debug command must take zero or one argument. Seek help.\n");
 		return;
 	}
 	else
 	{
-		char * secondKeyword =  (array_of_words)[1];
+		char * secondKeyword =  (argStrings)[1];
 		if(secondKeyword[0] == 'o' && secondKeyword[1] == 'n' && secondKeyword[2] == '\0')
 		{
 			if(debugOn == 1)
@@ -413,19 +477,19 @@ void debugMode()
 			else
 			{
 				debugOn = 0;
-				printf("Debug message will not be displayed\n");
+				printf("Debug message will not be displayed");
 			}
 		}
 		else
-			printf("Error. Not a valid input for debug keyword. Seek help.\n");
+			printf("Error. Not a valid input for debug keyword. Seek help.");
 	}
 
 
 }
 
-void helpDesk()
+void helpDesk(uint8_t argNum, char* argStrings[])
 {
-	if(wordCount < 2) {
+	if(argNum < 2) {
 		printf("add <num1> ... <num N> : Sum one or more numbers.\n");
 		printf("sub <num1> <num 2> : Subtract two numbers.\n");
 		printf("mul <num1> ... <num N> : Multiply one or more numbers.\n");
@@ -440,8 +504,8 @@ void helpDesk()
 		printf("mod <num1> <num2>: Finds the modulo of two INTEGERS.\n");
 
 	}
-	else if(wordCount == 2)	{
-		char * secondKeyword =  (array_of_words)[1];
+	else if(argNum == 2)	{
+		char * secondKeyword =  (argStrings)[1];
 
 			if(secondKeyword[0] == 'a' && secondKeyword[1] == 'd' && secondKeyword[2] == 'd' && secondKeyword[3] == '\0')
 				printf("add <num1> ... <num N> : Sum one or more numbers.\n");
@@ -519,7 +583,7 @@ void CommandLineParserProcess(void)
     	// Parse the input and print result
       	wordCount = string_parser(command_line, &array_of_words);
       	if(debugOn == 1) printArrayOfWords();
-      	analyseKeywords();
+      	analyseKeywords(wordCount, array_of_words);
       	freeEverything();
 
   }
@@ -534,17 +598,23 @@ void CommandLineParserProcess(void)
 
 
 void buildInputString(uint8_t c){
-	if(buildInputStringFirstTime == 1)	  {
+
+	printf("got %c\n", c);
+	if(buildInputStringFirstTime == 1)
+	{
 	  newString = (char*)malloc(sizeof(char)); //start of string. will have reallocation of memory if string is longer
 	  buildInputStringFirstTime = 0; //now not the first run through
-	  if(c == '\0' || c == 10) {
+	  if(c == '\0' || c == 10)
+	  {
 		  newString[stringIndex] = '\0';
+
+//		  printf("Inputted string is: %s\n", newString);
 
 		  wordCount = string_parser(newString, &array_of_words);
 
 		  //printArrayOfWords();
 		  //printf("DEBUG: word count -> %d", wordCount);
-		  analyseKeywords();
+		  analyseKeywords(wordCount, array_of_words); //todo fix globals
 		  freeEverything();
 
 		  //printNewString();
@@ -562,17 +632,29 @@ void buildInputString(uint8_t c){
 		if(c == '\0' || c == 10){
 		  newString[stringIndex] = '\0';
 
+
+		  printf("Inputted string is: %s\n", newString);
+
 		  wordCount = string_parser(newString, &array_of_words);
 		  if(debugOn == 1) printArrayOfWords();
-		  analyseKeywords();
-		  freeEverything();
+		  analyseKeywords(wordCount, array_of_words); //todo fix globals
+		  //freeEverything();
+		  strcpy(newString,"");
+		  for(int i = 0; i < wordCount; i++)
+		  {
+			  free(array_of_words[i]);
+		  }
+		  free(array_of_words);
+		  wordCount = 0;
 
 
 		  buildInputStringFirstTime = 1; //reset
 		  stringIndex = 0; //reset
 
 		}
-		else{
+		else
+		{
+			printf("adding %c to index %d\n", c, stringIndex);
 		  newString[stringIndex] = c;
 		  stringIndex++;
 		}
