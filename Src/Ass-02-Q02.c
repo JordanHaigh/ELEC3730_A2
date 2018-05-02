@@ -441,9 +441,9 @@ double doEquals()
 
 	char operators[2][2]= {{'*', '/'},{'+', '-'}};
 	char resultString[64];
-	while(done == 0)
-	{
-		printf("looping...\n");
+//	while(done == 0)
+//	{
+//		printf("looping...\n");
 		for(int i = 0 ; i < 2; i++)
 		{
 			//for(int j = 0 ; j<inputStringIndex + 1 ; j++ )
@@ -496,19 +496,23 @@ double doEquals()
 
 	//					printf("input string at 3 %s", inputString);
 
-						printf("Left%d, Right %d, j %d\n", leftCounter, rightCounter , j);
+						printf("Left %d, Right %d, j %d\n", leftCounter, rightCounter , j);
 
 
 	//					printf("inputString before %s\n", inputString);
 
 
 
-						char* leftNum = malloc(sizeof(char) * (leftCounter-1));
+						char* leftNum = (char*)malloc(sizeof(char) * (leftCounter-1));
+						printf("1");
 						strcpy(leftNum, "");  //init
+						printf("1");
 						strncat(leftNum, &inputString[j-leftCounter+1], leftCounter -1);
-
-						char* rightNum = malloc(sizeof(char) * (rightCounter-1));
+						printf("1");
+						char* rightNum = (char*)malloc(sizeof(char) * (rightCounter-1));
+						printf("1");
 						strcpy(rightNum, "");  //init
+						printf("1");
 						strncat(rightNum, &inputString[j +1], rightCounter -1);
 
 						printf("inputString %s\n", inputString);
@@ -610,7 +614,7 @@ double doEquals()
 				}
 			}
 		}
-	}
+//	}
 
 
 	printf("Final result is %s", resultString);
