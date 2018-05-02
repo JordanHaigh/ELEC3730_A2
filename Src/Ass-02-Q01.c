@@ -346,7 +346,10 @@ float mulNumbers(uint8_t argNum, char* argStrings[])
 	uint8_t firstTime = 1;
 	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = atof((argStrings)[i]);
+		float stringToFloat = 0;
+		sscanf(argStrings[i],"%f",&stringToFloat);
+
+		//float stringToFloat = atof((argStrings)[i]);
 
 		if(firstTime)
 		{

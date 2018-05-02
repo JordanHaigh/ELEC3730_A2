@@ -28,6 +28,7 @@ char* outputString;
 static int inputStringIndex = 0;
 static int decimalPointPlaced = 0;
 static int firstTime = 1;
+static int equalsPressed = 0;
 
 
 void CalculatorInit(void);
@@ -124,12 +125,14 @@ void CalculatorProcess(void)
 	      printf("TOUCH:  Got (%3d,%3d)\n", display.x, display.y);
 
 	      if(currentButtonPressed.id != 999)
+	      {
 	    	  analyseTouch(currentButtonPressed);
 
 	      	  BSP_LCD_DisplayStringAt(20,40,inputString ,LEFT_MODE);
 
 
 
+	      }
 
 	  }
   }
@@ -207,6 +210,16 @@ void analyseTouch(Button currentButtonPressed)
 		//printf("input string starts with %s", inputString);
 		firstTime = 0;
 	}
+
+    if(equalsPressed == 1)
+    {
+		equalsPressed = 0;
+		strcpy(inputString,""); //reset input string
+		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+		BSP_LCD_FillRect(1, 1, 318, 78);
+		//revert to black text
+		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+    }
 
 	int buttonId = currentButtonPressed.id;
 
@@ -349,9 +362,11 @@ void analyseTouch(Button currentButtonPressed)
 		else
 		{
 			double result = doEquals(); //todo get iplementation for double to string for output
-			result ++; //todo not relevant, must be removed before submission
-			strcpy(inputString,"0");
-
+//			result ++; //todo not relevant, must be removed before submission
+//			strcpy(inputString,"0");
+			char resultString [64];
+			snprintf(resultString, sizeof(resultString), "%f",result);
+			strcpy(inputString, resultString);
 			//reset variables
 
 			firstTime = 1;
@@ -360,6 +375,9 @@ void analyseTouch(Button currentButtonPressed)
 			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 			BSP_LCD_FillRect(1, 1, 318, 78);
 			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+			equalsPressed = 1;
+//	      	BSP_LCD_DisplayStringAt(20,40,resultString ,LEFT_MODE);
+
 		}
 	}
 	else if(strcmp(buttonText, "clr") == 0)
@@ -405,17 +423,18 @@ double doEquals()
 {
 	int done = 0;
 	int stringIsAllNumbers = 1;
-	int memorySize = 10;
+	int memorySize = 20;
 	char* newString;
 	newString = malloc(sizeof(char) * 1);
 	strcpy(newString, "");  //init
-
+	float result = 0;
 	printf("Parsing is kinda implemented\n");
 
 	char operators[2][2]= {{'*', '/'},{'+', '-'}};
 	char resultString[64];
 	while(done == 0)
 	{
+		printf("looping...\n");
 		for(int i = 0 ; i < 2; i++)
 		{
 			//for(int j = 0 ; j<inputStringIndex + 1 ; j++ )
@@ -433,14 +452,39 @@ double doEquals()
 						{
 							leftCounter+=1;
 						}
+						if(leftCounter == 1){
+							for(int z = j+1; z < (int)strlen(inputString); z++){
+								if(isOperator(inputString[z])){
+									j = z;
+									int leftCounter = 1;
+									while(j-leftCounter >= 0 && !isOperator(inputString[j-leftCounter]))
+									{
+										leftCounter+=1;
+									}
+									break;
+
+
+								}
+
+							}
+
+						}
+						if(leftCounter ==1){
+							return result;
+
+						}
 
 						int rightCounter = 1;
 
 	//					while(j+rightCounter < inputStringIndex + 1 && !isOperator(inputString[j+rightCounter]))
-						while(j+rightCounter < (int)strlen(inputString) && !isOperator(inputString[j+rightCounter]))
+						while(j+rightCounter < (int)strlen(inputString) && !(isOperator(inputString[j+rightCounter]) && rightCounter != 1))
 						{
 							rightCounter+=1;
 						}
+
+
+
+
 	//					printf("input string at 3 %s", inputString);
 
 						printf("Left%d, Right %d, j %d\n", leftCounter, rightCounter , j);
@@ -462,7 +506,7 @@ double doEquals()
 						printf("rightNum %s\n", rightNum);
 						printf("leftNum %s\n\n", leftNum);
 
-						float result = compute(operators[i][k],leftNum,rightNum);
+						result = compute(operators[i][k],leftNum,rightNum);
 						snprintf(resultString, sizeof(resultString), "%f",result);
 
 						char* fixedString = (char*)malloc(sizeof(char));
@@ -481,6 +525,7 @@ double doEquals()
 							}
 						}
 						snprintf(resultString, sizeof(resultString), "%f", result);
+
 						for(int z = 0; resultString[z] != '\0';z++)
 						{
 							fixedString[fixedStringIndex] = resultString[z];
@@ -492,6 +537,7 @@ double doEquals()
 
 							}
 						}
+
 						for(int z = j + rightCounter; z < (int)strlen(inputString);z++)
 						{
 							fixedString[fixedStringIndex] = inputString[z];
@@ -503,14 +549,17 @@ double doEquals()
 
 							}
 						}
+						if(fixedStringIndex +1 == memorySize){
+							fixedString = (char*)realloc(fixedString,sizeof(char)*(memorySize +1));
+						}
 
-						fixedString = (char*)realloc(fixedString,sizeof(char)* memorySize +1);
 						fixedString[fixedStringIndex] = '\0';
 						fixedStringIndex++;
 
 						printf("Current fixed stirng %s\n", fixedString);
 						//string is now fixed
-
+						free(inputString);
+						inputString = (char*)malloc(sizeof(char) *(int)strlen(fixedString));
 						strcpy(inputString, fixedString);
 						free(fixedString);
 						free(leftNum);
@@ -558,7 +607,7 @@ double doEquals()
 	printf("Final result is %s", resultString);
 
 
-	return 1.0; //todo wrong. replace with correct result
+	return result;
 }
 
 
