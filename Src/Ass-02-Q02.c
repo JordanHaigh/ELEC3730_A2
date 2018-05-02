@@ -403,137 +403,158 @@ void concatenateButtonText(char* buttonText)
 
 double doEquals()
 {
-//	printf("input string at equals %s\n", inputString);
+	int done = 0;
+	int stringIsAllNumbers = 1;
+	int memorySize = 10;
 	char* newString;
-//	printf("input string at equals 2 %s\n", inputString);
-
 	newString = malloc(sizeof(char) * 1);
-//	printf("input string at equals 3 %s\n", inputString);
-
 	strcpy(newString, "");  //init
-//	printf("input string at equals 4 %s\n", inputString);
-
 
 	printf("Parsing is kinda implemented\n");
-//	printf("input string at equals 5 %s\n", inputString);
 
 	char operators[2][2]= {{'*', '/'},{'+', '-'}};
-	float finalResult = 0;
 	char resultString[64];
-
-//	printf("input string at equals 1 %s\n", inputString);
-
-	for(int i = 0 ; i < 2; i++)
+	while(done == 0)
 	{
-		for(int j = 0 ; j<inputStringIndex + 1 ; j++ )
+		for(int i = 0 ; i < 2; i++)
 		{
-			for(int k = 0 ; k< 2;k++)
+			//for(int j = 0 ; j<inputStringIndex + 1 ; j++ )
+			for(int j = 0; j <= (int)strlen(inputString);j++)
 			{
-				if(operators[i][k] == inputString[j]){
-//					printf("input string at 1 %s\n", inputString);
-
-					printf("found operator %c\n" , inputString[j]);
-					int leftCounter = 1;
-					while(j-leftCounter >= 0 && !isOperator(inputString[j-leftCounter]))
+				for(int k = 0 ; k< 2;k++)
+				{
+					if(operators[i][k] == inputString[j])
 					{
-						leftCounter+=1;
-					}
-//					printf("input string at 2 %s", inputString);
+	//					printf("input string at 1 %s\n", inputString);
 
-					int rightCounter = 1;
-					while(j+rightCounter < inputStringIndex + 1 && !isOperator(inputString[j+rightCounter]))
+						printf("found operator %c\n" , inputString[j]);
+						int leftCounter = 1;
+						while(j-leftCounter >= 0 && !isOperator(inputString[j-leftCounter]))
+						{
+							leftCounter+=1;
+						}
+
+						int rightCounter = 1;
+
+	//					while(j+rightCounter < inputStringIndex + 1 && !isOperator(inputString[j+rightCounter]))
+						while(j+rightCounter < (int)strlen(inputString) && !isOperator(inputString[j+rightCounter]))
+						{
+							rightCounter+=1;
+						}
+	//					printf("input string at 3 %s", inputString);
+
+						printf("Left%d, Right %d, j %d\n", leftCounter, rightCounter , j);
+
+
+	//					printf("inputString before %s\n", inputString);
+
+
+
+						char* leftNum = malloc(sizeof(char) * (leftCounter-1));
+						strcpy(leftNum, "");  //init
+						strncat(leftNum, &inputString[j-leftCounter+1], leftCounter -1);
+
+						char* rightNum = malloc(sizeof(char) * (rightCounter-1));
+						strcpy(rightNum, "");  //init
+						strncat(rightNum, &inputString[j +1], rightCounter -1);
+
+						printf("inputString %s\n", inputString);
+						printf("rightNum %s\n", rightNum);
+						printf("leftNum %s\n\n", leftNum);
+
+						float result = compute(operators[i][k],leftNum,rightNum);
+						snprintf(resultString, sizeof(resultString), "%f",result);
+
+						char* fixedString = (char*)malloc(sizeof(char));
+						strcpy(fixedString, "");
+						int fixedStringIndex = 0;
+
+						for(int z = 0; z <= j-leftCounter;z++)
+						{
+							fixedString[fixedStringIndex] = inputString[z];
+							fixedStringIndex++;
+							if(fixedStringIndex == memorySize)
+							{
+								memorySize *= 2;
+								fixedString = (char*)realloc(fixedString,sizeof(char) * memorySize);
+
+							}
+						}
+						snprintf(resultString, sizeof(resultString), "%f", result);
+						for(int z = 0; resultString[z] != '\0';z++)
+						{
+							fixedString[fixedStringIndex] = resultString[z];
+							fixedStringIndex++;
+							if(fixedStringIndex == memorySize)
+							{
+								memorySize *= 2;
+								fixedString = (char*)realloc(fixedString,sizeof(char) * memorySize);
+
+							}
+						}
+						for(int z = j + rightCounter; z < (int)strlen(inputString);z++)
+						{
+							fixedString[fixedStringIndex] = inputString[z];
+							fixedStringIndex++;
+							if(fixedStringIndex == memorySize)
+							{
+								memorySize *= 2;
+								fixedString = (char*)realloc(fixedString,sizeof(char) * memorySize);
+
+							}
+						}
+
+						fixedString = (char*)realloc(fixedString,sizeof(char)* memorySize +1);
+						fixedString[fixedStringIndex] = '\0';
+						fixedStringIndex++;
+
+						printf("Current fixed stirng %s\n", fixedString);
+						//string is now fixed
+
+						strcpy(inputString, fixedString);
+						free(fixedString);
+						free(leftNum);
+						free(rightNum);
+
+
+						int foundOperator = 0;
+						for(int z = 0; z < (int)strlen(inputString);z++)
+						{
+							printf("Current char in inputstring =>%c\n", inputString[z]);
+							if(isOperator(inputString[z]) == 1)
+							{
+								foundOperator = 1; //not done
+								break;
+							}
+						}
+						if(foundOperator == 0)//no more operators
+						{
+							done = 1; //finished
+						}
+					}
+					else
 					{
-						rightCounter+=1;
+						//printf("found number");
+						//need to check if there are any operators in the string
+						for(int z = j; z <= (int)strlen(inputString);z++)
+						{
+							//printf("Current char in inputstring =>%c\n", inputString[z]);
+							stringIsAllNumbers = stringIsAllNumbers && (isOperator(inputString[z]) == 0);
+						}
+						if(stringIsAllNumbers == 1)
+						{
+							printf("string was all numbers\n");
+							done = 1;
+							return atof(inputString);
+
+						}
 					}
-//					printf("input string at 3 %s", inputString);
-
-					printf("Left%d, Right %d, j %d\n", leftCounter, rightCounter , j);
-
-
-//					printf("inputString before %s\n", inputString);
-
-
-
-					char* leftNum = malloc(sizeof(char) * (leftCounter-1));
-					strcpy(leftNum, "");  //init
-					strncat(leftNum, &inputString[j-leftCounter+1], leftCounter -1);
-					char* rightNum = malloc(sizeof(char) * (rightCounter-1));
-					strcpy(rightNum, "");  //init
-					strncat(rightNum, &inputString[j +1], rightCounter -1);
-					printf("inputString %s\n", inputString);
-					printf("rightNum %s\n", rightNum);
-					printf("leftNum %s\n\n", leftNum);
-
-					float result = compute(operators[i][k],leftNum,rightNum);
-					finalResult += result;
-
-
-					//need to replace the left, right and operator in current string
-					char* fixedString = (char*)malloc(sizeof(inputString));
-					snprintf(resultString, sizeof(resultString), "%f", result);
-					strcpy(fixedString, resultString);
-
-					size_t correctAllocationAmount = strlen(inputString) - (strlen(inputString) - (size_t)(leftNum - 1));
-					int a = (int)correctAllocationAmount;
-					char* substring = (char*)malloc(sizeof(char) * a);
-
-					strncpy(substring, substring+a,(int)strlen(substring));
-					substring[strlen(substring)] = '\0';
-
-					printf("substring is %s\n", substring);
-
-					//strcat(fixedString, ) //right counter +1 onwards...
-
-					//resultString = (char*)malloc(sizeof(char) * maxSize);
-					//strcpy(resultString,"");
-
-					//snprintf(resultString, sizeof(resultString), "%f", result);
-					//printf("result %f", result);
-					//printf("current string %s", resultString);
-//
-//					char* tempString = (char*)malloc();
-//
-//
-//					strncpy(tempString, &inputString[0], j-leftCounter+1);
-//					strcat(tempString, result);
-//					strcat(tempString,&inputString[j+rightCounter]);
-//					printf("after computation %s",tempString);
-//
-//
-//					strcpy(inputString, tempString);
-					//free(resultString);
-					free(leftNum);
-					free(rightNum);
-					free(substring);
-
-
-
-//					char* charToConcat = malloc(sizeof(char)); //free later
-//					strcpy(charToConcat,"");
-//
-//					for(int posCounter =j-leftCounter+1 ; posCounter < j+rightCounter; posCounter++ )
-//					{
-//						//make temp char array of size 1
-//						//todo may need to extend temp char array for items with length > 1
-//						//todo or it'll be fine? because we are concatenating single chars to build the new string
-//						//todo then from the new string we can derive what operation is being applied.
-//						char temp[1];
-//						temp[0] = inputString[posCounter];
-//						strcat(charToConcat,temp);
-//						printf("charTOConcet ==%s \n",charToConcat );
-//					}
-//
-//					newString = realloc(newString, sizeof(newString)+ sizeof(charToConcat));
-//					strcat(newString, charToConcat);
-//					free(charToConcat);
-//
-//					printf("newString == %s\n", newString);
 				}
 			}
 		}
 	}
 
-	snprintf(resultString, sizeof(resultString), "%f", finalResult);
+
 	printf("Final result is %s", resultString);
 
 
