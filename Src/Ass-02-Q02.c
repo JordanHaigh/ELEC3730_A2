@@ -66,8 +66,6 @@ void CalculatorInit(void)
   BSP_LCD_SetFont(&Font12);
   BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 
-
-
   printf("width = %d\n", (int)BSP_LCD_GetXSize());
   printf("height = %d\n", (int)BSP_LCD_GetYSize());
 
@@ -85,6 +83,7 @@ void CalculatorInit(void)
 
   BSP_LCD_DisplayStringAt(20,40,"0" ,LEFT_MODE); //init calculator with 0
 
+//  BSP_LCD_SetFont(&Font24);
 }
 
 void CalculatorProcess(void)
@@ -94,8 +93,6 @@ void CalculatorProcess(void)
   static uint8_t fingerTouching = 0;
   static uint8_t bounce = 0;
   static uint8_t offBounce = 0;
-
-  Button currentButtonPressed;
 
   //Now determine which button was pressed on touch screen
   if(BSP_TP_GetDisplayPoint(&display) == 0 && fingerTouching == 0)//0 means valid point on LCD. 1 otherwise(bad coordinate or dodgy LCD)
@@ -108,6 +105,7 @@ void CalculatorProcess(void)
 		  fingerTouching = 1;
 		  bounce = 0;
 
+		  Button currentButtonPressed;
 		  //initialise text and id for now. gets around warnings thrown in the below printf.
 		  //if an actual button is found, it will update the currentButtonPressed
 		  currentButtonPressed.text = "OUTPUT BAR- NOT A BUTTON";
@@ -129,7 +127,11 @@ void CalculatorProcess(void)
 	      if(currentButtonPressed.id != 999)
 	      {
 	    	  analyseTouch(currentButtonPressed);
+
 	      	  BSP_LCD_DisplayStringAt(20,40,inputString ,LEFT_MODE);
+
+
+
 	      }
 
 	  }
@@ -141,6 +143,7 @@ void CalculatorProcess(void)
 	  {
 		  fingerTouching = 0;
 		  //printf("Finger off..\n");
+
 	  }
 
   }
@@ -158,6 +161,7 @@ Button buildButton(int x , int y, int w, int h, int id){
 	b.id = id;
 
 	b.text = textArray[id];
+
 	return b;
 }
 
@@ -177,10 +181,13 @@ int buttonHere(int x, int y, Button button)
 void showButton(Button button){
 
 	BSP_LCD_DrawRect(button.startX, button.startY, button.width, button.height);
-	if(strcmp(button.text,"sqrt") == 0)
+
+	if(strcmp(button.text, "sqrt") == 0)
 		BSP_LCD_SetFont(&Font12);
 	else
 		BSP_LCD_SetFont(&Font16);
+
+
 
 	BSP_LCD_DisplayStringAt(button.startX + button.width/2,button.startY + button.height/2,button.text,CENTER_MODE);
 
@@ -270,7 +277,7 @@ void analyseTouch(Button currentButtonPressed)
 
 		}
 		if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
-				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0 || strcmp(buttonText,"+-") == 0)
+				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
 		{
 			concatenateButtonText(buttonText);
 		}
@@ -298,25 +305,6 @@ void analyseTouch(Button currentButtonPressed)
 			printf("error. already placed decimal point...\n");
 			//return;
 		}
-	}
-	else if(strcmp(buttonText,"+-") == 0)
-	{
-		printf("Found +-");
-		//make sure there isnt a +- before this one - check for number
-		char previousChar = inputString[inputStringIndex];
-		printf("previous char =>%c\n",previousChar);
-		if(!(previousChar >= '0' && previousChar <= '9'))
-		{
-			printf("Error. must have number before a +-\n");
-		}
-		else
-		{
-			//good to go
-			//concatenate to end of string
-			concatenateButtonText(buttonText);
-
-		}
-
 	}
 	else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
 			strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
@@ -382,7 +370,9 @@ void analyseTouch(Button currentButtonPressed)
 		}
 		else
 		{
-			double result = doEquals();
+			double result = doEquals(); //todo get iplementation for double to string for output
+//			result ++; //todo not relevant, must be removed before submission
+//			strcpy(inputString,"0");
 			char resultString [64];
 			snprintf(resultString, sizeof(resultString), "%f",result);
 			strcpy(inputString, resultString);
@@ -425,6 +415,8 @@ void analyseTouch(Button currentButtonPressed)
 
 void concatenateButtonText(char* buttonText)
 {
+
+
 	if(inputStringIndex + 3 >= maxSize){
 		maxSize *= 2;
 		inputString = (char*)realloc(inputString, maxSize*sizeof(char));
@@ -695,4 +687,3 @@ int isOperator(char input ){
 	}
 	return 0;
 }
-
