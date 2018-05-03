@@ -1,0 +1,9 @@
+utf 16 characters in command line
+
+
+mantissa
+big big number + small number  -> crash
+
+mantissa + e^1
+
+single precision floating point

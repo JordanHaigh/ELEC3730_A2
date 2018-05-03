@@ -1,6 +1,11 @@
-//     $Date: 2018-03-26 08:32:18 +1100 (Mon, 26 Mar 2018) $
-// $Revision: 1217 $
-//   $Author: Peter $
+/**
+ * ELEC3730 ASSIGNMENT 2
+ * QUESTION 1 - COMMAND LINE PARSER
+ * JORDAN HAIGH AND EVAN GRESHAM
+ *
+ * File takes in user input either from STM32 (Putty) or command line
+ * Utilises keywords to perform mathematical functions
+ * */
 
 #include "Ass-02.h"
 #include "Ass-02-Q01.h"
@@ -12,18 +17,19 @@
 #include "usart.h"
 #endif
 
-
+//Global constants necessary for consistent looping
 uint8_t debugOn = 0;
 int wordCount = 0;
-char **array_of_words;
-char* newString;
-int length = 10;
+char **array_of_words; //array of words found from command line
+char* newString; //building string from command line
+int length = 10; //used for memory allocation
 int stringIndex = 0;
 uint8_t buildInputStringFirstTime = 1;
 
 
 
-
+//Structure defined inside C file, though defined in the .h file
+//Allows for structure to be used in Question 2
 #ifndef MECOMMANDLIST
 #define MECOMMANDLIST
 const command_s commandList[] = {
@@ -42,7 +48,9 @@ const command_s commandList[] = {
 };
 #endif
 
-
+/*
+ * If the program has found more than 1 word, print out each word found
+ * */
 void printArrayOfWords()
 {
 	if (wordCount != 0) {
@@ -55,7 +63,9 @@ void printArrayOfWords()
 		printf("No words found\n");
 }
 
-
+/*
+ * Used to free global char arrays - newString(created from newString), array_of_words
+ * */
 void freeEverything()
 {
 	free(newString);
@@ -63,6 +73,11 @@ void freeEverything()
 }
 
 
+/*
+ * Main area where the keywords found from command line are parsed
+ * Gathers the first keyword and checks char by char if it is a valid keyword for mathematical operation
+ * Needs to check first if the string parser was able to find any words - otherwise crash.
+ * */
 void analyseKeywords(uint8_t argNum, char* argStrings[])
 {
 
@@ -105,39 +120,51 @@ void analyseKeywords(uint8_t argNum, char* argStrings[])
 		printf("Error. Unrecognised command. Seek help.\n");
 
 }
-
+/*
+ * Performs error checking on the argStrings to make sure its valid input before calculating the square root
+ * */
 float validateSquareRoot(uint8_t argNum, char* argStrings[])
 {
 	return validateAndRunRoot(0,argNum,argStrings);
 }
 
+/*
+ * Performs error checking on the argStrings to make sure its valid input before calculating cube root
+ * */
 float validateCubeRoot(uint8_t argNum, char* argStrings[])
 {
 	return validateAndRunRoot(1,argNum,argStrings);
 }
 
+/*
+ * Checks that the argument length of string is correct. If correct,
+ * */
 float validateAndRunRoot(uint8_t flag, uint8_t argNum, char* argStrings[])
 {
-	float result = 0; //sentinel
-	if(checkArgumentLength2(1,2, argNum) == 0)
+	float result = 0; //Start at zero. Will be changed later
+	if(checkArgumentLength2(1,2, argNum) == 0) //If Fail
 		printf("Error. Must contain only one number for Root.\n");
 	else
 	{
+		//Argument length did not fail, make sure we are working with numerical arguments
 		if(checkForNumericArgument2(0,argNum, argStrings) == 1)
 		{
 			//float result;
-			if(flag == 0) //sqrt
+			if(flag == 0) //Flag for calculating square root
 				result = squareRoot(argStrings);
-			else //cbrt
+			else //Flag for calculating cube root
 				result = cubeRoot(argStrings);
 
-			printf("Result: %.2f\n", result);
+			printf("Result: %.2f\n", result); //Print result to putty/command line
 		}
 	}
 
 	return result;
 }
 
+/*
+ *
+ * */
 float squareRoot(char* argStrings[])
 {
 	float result = atof(argStrings[1]);
