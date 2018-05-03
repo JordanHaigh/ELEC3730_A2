@@ -42,6 +42,8 @@ void buttonToString(Button button);
 void analyseTouch(Button currentButtonPressed);
 void concatenateButtonText(char* buttonText);
 double doEquals();
+double doEquals2();
+
 int isOperator(char);
 int maxSize = 20;
 
@@ -370,7 +372,8 @@ void analyseTouch(Button currentButtonPressed)
 		}
 		else
 		{
-			double result = doEquals(); //todo get iplementation for double to string for output
+			double result = doEquals2();
+//			double result = doEquals(); //todo get iplementation for double to string for output
 //			result ++; //todo not relevant, must be removed before submission
 //			strcpy(inputString,"0");
 			char resultString [64];
@@ -427,6 +430,75 @@ void concatenateButtonText(char* buttonText)
 	printf("inputstringindex => %d\n", inputStringIndex);
 
 }
+double doEquals2(){
+	int numberOfNumbers = 0;
+	int numberOfOperators = 0;
+	int lookingAtNumber = 0;
+	for(int i = 0; i< (int)strlen(inputString); i++){
+		if(isOperator(inputString[i])){
+			numberOfOperators +=1;
+			lookingAtNumber =0;
+		}else{
+			if(lookingAtNumber == 0){
+				numberOfNumbers +=1;
+				lookingAtNumber = 1;
+			}
+		}
+	}
+
+
+
+	double* numbers = (double*)malloc(sizeof(double) * numberOfNumbers);
+	char* operators = (char*)malloc(sizeof(char) * numberOfOperators);
+	int numbersIndex = 0;
+	int operatorIndex = 0;
+
+	int startI = -1;
+
+	for(int i = 0 ;i< (int)strlen(inputString); i++){
+		if(isOperator(inputString[i])){
+			if(startI != i-1){
+
+				char* tempNumber = (char*)malloc(sizeof(char) *( i-startI));
+				strncpy(tempNumber, &inputString[startI],i-startI);
+
+				double d;
+				sscanf(tempNumber,"%lf",&d);
+				numbers[numbersIndex] = d;
+				numbersIndex +=1;
+
+				free(tempNumber);
+				startI = i;
+
+				operators[operatorIndex] = inputString[i];
+				operatorIndex +=1;
+
+			}else{//if previous index was an operator as well or this is the first position then this is a minus
+			}
+
+
+
+		}
+	}
+
+	printf("numberOfNumbers %d  numberOfOperators %d\n",numberOfNumbers, numberOfOperators);
+	for(int i = 0 ; i< numberOfNumbers;i++){
+		printf("numbers %d : %lf\n", i,numbers[i]);
+
+	}
+
+	for(int i = 0 ; i< numberOfOperators;i++){
+		printf("operators %d : %c\n", i,operators[i]);
+
+	}
+
+
+	return 1.0;
+
+
+
+}
+
 
 double doEquals()
 {
