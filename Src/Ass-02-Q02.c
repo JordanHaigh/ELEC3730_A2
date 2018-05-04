@@ -41,13 +41,13 @@ void buttonToString(Button button);
 
 void analyseTouch(Button currentButtonPressed);
 void concatenateButtonText(char* buttonText);
-float doEquals();
-float doEquals2();
+double doEquals();
+double doEquals2();
 
 int isOperator(char);
 int maxSize = 20;
 
-float compute(char operator,char* leftNum,char* rightNum);
+double compute(char operator,char* leftNum,char* rightNum);
 char answer[50];
 
 
@@ -376,13 +376,13 @@ void analyseTouch(Button currentButtonPressed)
 		else
 		{
 
-			float result = doEquals2();
+			double result = doEquals2();
 
-//			float result = doEquals(); //todo get iplementation for float to string for output
+//			double result = doEquals(); //todo get iplementation for double to string for output
 //			result ++; //todo not relevant, must be removed before submission
 //			strcpy(inputString,"0");
 			char resultString [64];
-			snprintf(resultString, sizeof(resultString), "%f",result);
+			snprintf(resultString, sizeof(resultString), "%lf",result);
 			strcpy(inputString, resultString);
 			strcpy(answer,resultString);
 			//reset variables
@@ -417,7 +417,7 @@ void analyseTouch(Button currentButtonPressed)
 	else if(strcmp(buttonText , "+-") == 0)
 	{
 		if(inputString[inputStringIndex] == '-' && (inputStringIndex ==0  || isOperator(inputString[inputStringIndex-1]))){
-			//the minus we are looking at is for negating a number\
+			//the minus we are looking at is for negating a number
 			//so we need to remove it
 			inputString[inputStringIndex] = '\0';
 			inputStringIndex -=1;
@@ -544,7 +544,7 @@ void concatenateButtonText(char* buttonText)
 }
 
 
-float doEquals2(){
+double doEquals2(){
 
 	printf("Entering doEquals2()   inputString %s\n", inputString);
 	int numberOfNumbers = 0;
@@ -611,8 +611,8 @@ float doEquals2(){
 					}
 				}
 
-//				float d;
-//				sscanf(tempNumber,"%f",&d);
+//				double d;
+//				sscanf(tempNumber,"%lf",&d);
 //				numbers[numbersIndex] = tempNumber;
 				numbersIndex +=1;
 
@@ -653,8 +653,8 @@ float doEquals2(){
 	}
 
 //	tempNumber[i-startI] ='\0';
-//				float d;
-//				sscanf(tempNumber,"%f",&d);
+//				double d;
+//				sscanf(tempNumber,"%lf",&d);
 //	numbers[numbersIndex] = tempNumber;
 	numbersIndex +=1;
 
@@ -682,10 +682,10 @@ float doEquals2(){
 			for(int specificOperator = 0; specificOperator < 2; specificOperator++ ){//for each operator in the group
 				if(operators[i] == operatorOrder[operatorGroup][specificOperator]){
 					//if operator found which matches the one we are looking at
-					float result = 0;
+					double result = 0;
 					char resultString[64];
 					result = compute(operators[i],numbers[i], numbers[i+1]);
-					snprintf(resultString, sizeof(resultString), "%f",result);
+					snprintf(resultString, sizeof(resultString), "%lf",result);
 					printf("left Number: %s \t operator: %c \t right Number: %s \t result: %s \n", numbers[i], operators[i], numbers[i+1], resultString);
 
 
@@ -747,9 +747,9 @@ float doEquals2(){
 //					numbers = newNumbers;
 
 					if(numberOfOperators ==0){
-						float finalResult =0;
-						sscanf(numbers[0],"%f",&finalResult);
-						printf("finalResult %f\n", finalResult );
+						double finalResult =0;
+						sscanf(numbers[0],"%lf",&finalResult);
+						printf("finalResult %lf\n", finalResult );
 
 //						for(int n = 0; n< originalNumberOfNumbers ; n++){
 //							free(numbers[n]);
@@ -775,8 +775,8 @@ float doEquals2(){
 	}
 
 
-	float finalResult =0;
-	sscanf(numbers[0],"%f",&finalResult);
+	double finalResult =0;
+	sscanf(numbers[0],"%lf",&finalResult);
 //	for(int n = 0; n< originalNumberOfNumbers ; n++){
 //		free(numbers[n]);
 //	}
@@ -791,15 +791,15 @@ float doEquals2(){
 }
 
 
-float doEquals()
+double doEquals()
 {
-	int done = 0;
+	//int done = 0;
 	int stringIsAllNumbers = 1;
 	int memorySize = 20;
 	char* newString;
 	newString = malloc(sizeof(char) * 1);
 	strcpy(newString, "");  //init
-	float result = 0;
+	double result = 0;
 	printf("Parsing is kinda implemented\n");
 
 	char operators[2][2]= {{'x', '/'},{'+', '-'}};
@@ -883,7 +883,7 @@ float doEquals()
 						printf("leftNum %s\n\n", leftNum);
 
 						result = compute(operators[i][k],leftNum,rightNum);
-						snprintf(resultString, sizeof(resultString), "%f",result);
+						snprintf(resultString, sizeof(resultString), "%lf",result);
 
 						char* fixedString = (char*)malloc(sizeof(char));
 						strcpy(fixedString, "");
@@ -900,7 +900,7 @@ float doEquals()
 
 							}
 						}
-						snprintf(resultString, sizeof(resultString), "%f", result);
+						snprintf(resultString, sizeof(resultString), "%lf", result);
 
 						for(int z = 0; resultString[z] != '\0';z++)
 						{
@@ -954,7 +954,7 @@ float doEquals()
 						}
 						if(foundOperator == 0)//no more operators
 						{
-							done = 1; //finished
+							//done = 1; //finished
 						}
 					}
 					else
@@ -969,7 +969,7 @@ float doEquals()
 						if(stringIsAllNumbers == 1)
 						{
 							printf("string was all numbers\n");
-							done = 1;
+							//done = 1;
 							return atof(inputString);
 
 						}
@@ -987,7 +987,7 @@ float doEquals()
 }
 
 
-float compute(char operator,char* leftNum,char* rightNum){
+double compute(char operator,char* leftNum,char* rightNum){
 	/**
 	*	Used as reference to commandList[]
 	*
@@ -1008,7 +1008,7 @@ float compute(char operator,char* leftNum,char* rightNum){
 
 
 	//todo use correct names for function
-	float result = 0;
+	double result = 0;
 	char* numbers[3] = {NULL,leftNum,rightNum};
 	switch(operator){
 	case 'x':
@@ -1027,11 +1027,11 @@ float compute(char operator,char* leftNum,char* rightNum){
 		//printf("finished add\n");
 
 //		result = atof(leftNum);
-//		printf("leftNum %f\n",atof(leftNum));
-//		printf("result -> %f\n", result);
+//		printf("leftNum %lf\n",atof(leftNum));
+//		printf("result -> %lf\n", result);
 //
 //		result += atof(rightNum);
-//		printf("result -> %f\n", result);
+//		printf("result -> %lf\n", result);
 ////		result = addNumbers(2,numbers);
 		break;
 	case '-':

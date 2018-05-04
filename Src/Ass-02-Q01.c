@@ -123,7 +123,7 @@ void analyseKeywords(uint8_t argNum, char* argStrings[])
 /*
  * Performs error checking on the argStrings to make sure its valid input before calculating the square root
  * */
-float validateSquareRoot(uint8_t argNum, char* argStrings[])
+double validateSquareRoot(uint8_t argNum, char* argStrings[])
 {
 	return validateAndRunRoot(0,argNum,argStrings);
 }
@@ -131,7 +131,7 @@ float validateSquareRoot(uint8_t argNum, char* argStrings[])
 /*
  * Performs error checking on the argStrings to make sure its valid input before calculating cube root
  * */
-float validateCubeRoot(uint8_t argNum, char* argStrings[])
+double validateCubeRoot(uint8_t argNum, char* argStrings[])
 {
 	return validateAndRunRoot(1,argNum,argStrings);
 }
@@ -139,9 +139,9 @@ float validateCubeRoot(uint8_t argNum, char* argStrings[])
 /*
  * Checks that the argument length of string is correct. If correct,
  * */
-float validateAndRunRoot(uint8_t flag, uint8_t argNum, char* argStrings[])
+double validateAndRunRoot(uint8_t flag, uint8_t argNum, char* argStrings[])
 {
-	float result = 0; //Start at zero. Will be changed later
+	double result = 0; //Start at zero. Will be changed later
 	if(checkArgumentLength2(1,2, argNum) == 0) //If Fail
 		printf("Error. Must contain only one number for Root.\n");
 	else
@@ -149,7 +149,7 @@ float validateAndRunRoot(uint8_t flag, uint8_t argNum, char* argStrings[])
 		//Argument length did not fail, make sure we are working with numerical arguments
 		if(checkForNumericArgument2(0,argNum, argStrings) == 1)
 		{
-			//float result;
+			//double result;
 			if(flag == 0) //Flag for calculating square root
 				result = squareRoot(argStrings);
 			else //Flag for calculating cube root
@@ -165,20 +165,20 @@ float validateAndRunRoot(uint8_t flag, uint8_t argNum, char* argStrings[])
 /*
  *
  * */
-float squareRoot(char* argStrings[])
+double squareRoot(char* argStrings[])
 {
-	float result = strtof(argStrings[1],NULL);
+	double result = strtof(argStrings[1],NULL);
 	return sqrtf(result);
 }
 
-float cubeRoot(char* argStrings[])
+double cubeRoot(char* argStrings[])
 {
 	return cbrtf(strtof(argStrings[1],NULL));
 }
 
-float validatePower(uint8_t argNum, char* argStrings[])
+double validatePower(uint8_t argNum, char* argStrings[])
 {
-	float result = 0;
+	double result = 0;
  	if(checkArgumentLength2(1,3, argNum) == 0)
 	{
 			printf("Error. Must contain only two numbers for Powers. ");
@@ -196,14 +196,14 @@ float validatePower(uint8_t argNum, char* argStrings[])
  	return result;
 }
 
-float power(char* argStrings[])
+double power(char* argStrings[])
 {
 	return powf(strtof(argStrings[1],NULL),strtof(argStrings[2],NULL));
 }
 
-float validateModulo(uint8_t argNum, char* argStrings[])
+double validateModulo(uint8_t argNum, char* argStrings[])
 {
-	float result = 0;
+	double result = 0;
 	if(checkArgumentLength2(1,3,argNum) == 0)
 		printf("Error. Must contain only two integers for Modulo.\n");
 	else
@@ -282,9 +282,9 @@ uint8_t checkForNumericArgument2(uint8_t processingIntegerFlag,uint8_t argNum, c
 	return 1;
 }
 
-float validateAddition(uint8_t argNum, char* argStrings[])
+double validateAddition(uint8_t argNum, char* argStrings[])
 {
-	float result = 0;
+	double result = 0;
 	if(checkArgumentLength2(0,99, argNum) == 0)
 		printf("Error. Must contain one or more numbers for addition.\n");
 	else
@@ -299,23 +299,23 @@ float validateAddition(uint8_t argNum, char* argStrings[])
 }
 
 
-float addNumbers(uint8_t argNum, char* argStrings[])
+double addNumbers(uint8_t argNum, char* argStrings[])
 {
 
-	float currentSum = 0;
+	double currentSum = 0;
 
 	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = strtof(argStrings[i],NULL);
-		currentSum += stringToFloat;
+		double stringToDouble = strtof(argStrings[i],NULL);
+		currentSum += stringToDouble;
 	}
 
 	return currentSum;
 }
 
-float validateSubtraction(uint8_t argNum, char* argStrings[])
+double validateSubtraction(uint8_t argNum, char* argStrings[])
 {
-	float result = 0;
+	double result = 0;
 	if(checkArgumentLength2(1,3,argNum) == 0)
 		printf("Error. Must contain exactly two numbers for subtraction\n");
 	else
@@ -329,30 +329,30 @@ float validateSubtraction(uint8_t argNum, char* argStrings[])
 	return result;
 }
 
-float subNumbers(uint8_t argNum, char* argStrings[])
+double subNumbers(uint8_t argNum, char* argStrings[])
 {
-	float currentSub = 0;
+	double currentSub = 0;
 	uint8_t firstRun = 1;
 	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = strtof(argStrings[i],NULL);
+		double stringToDouble = strtof(argStrings[i],NULL);
 
 		if(firstRun == 1)
 		{
-			currentSub = stringToFloat;
+			currentSub = stringToDouble;
 			firstRun = 0;
 		}
 		else
-			currentSub -= stringToFloat;
+			currentSub -= stringToDouble;
 	}
 
 	return currentSub;
 
 }
 
-float validateMultiplication(uint8_t argNum, char* argStrings[])
+double validateMultiplication(uint8_t argNum, char* argStrings[])
 {
-	float result = 0;
+	double result = 0;
 	if(checkArgumentLength2(0,99,argNum) == 0)
 		printf("Error. Must contain one or more numbers for multiplication.\n");
 	else
@@ -367,33 +367,35 @@ float validateMultiplication(uint8_t argNum, char* argStrings[])
 	return result;
 }
 
-float mulNumbers(uint8_t argNum, char* argStrings[])
+double mulNumbers(uint8_t argNum, char* argStrings[])
 {
-	float currentMul = 0;
+	double currentMul = 0;
 	uint8_t firstTime = 1;
 	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = 0;
-		sscanf(argStrings[i],"%f",&stringToFloat);
+		double stringToDouble = 0;
+		sscanf(argStrings[i],"%lf",&stringToDouble);
+		//printf("In mul - number to mul is %lf\n", stringToDouble);
 
-		//float stringToFloat = strtof((argStrings)[i]);
+
+		//double stringToDouble = strtof((argStrings)[i]);
 
 		if(firstTime)
 		{
-			currentMul = stringToFloat;
+			currentMul = stringToDouble;
 			firstTime = 0;
 
 		}
 		else
-			currentMul *= stringToFloat;
+			currentMul *= stringToDouble;
 	}
-
+	//printf("Current myl is %lf\n", currentMul);
 	return currentMul;
 }
 
-float validateDivision(uint8_t argNum, char* argStrings[])
+double validateDivision(uint8_t argNum, char* argStrings[])
 {
-	float result = 0;
+	double result = 0;
 	if(checkArgumentLength2(1,3,argNum) == 0)
 		printf("Error. Must contain exactly two numbers for division\n");
 	else
@@ -407,25 +409,25 @@ float validateDivision(uint8_t argNum, char* argStrings[])
 	return result;
 }
 
-float divNumbers(uint8_t argNum, char* argStrings[])
+double divNumbers(uint8_t argNum, char* argStrings[])
 {
-	float currentDiv = 0;
+	double currentDiv = 0;
 	uint8_t firstRun = 1;
 	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = strtof((argStrings)[i],NULL);
-		if(stringToFloat == 0.0)
+		double stringToDouble = strtof((argStrings)[i],NULL);
+		if(stringToDouble == 0.0)
 		{
 			return 0.0; //it was always going to be a 0.0 result regardless
 		}
 
 		if(firstRun == 1)
 		{
-			currentDiv = stringToFloat;
+			currentDiv = stringToDouble;
 			firstRun = 0;
 		}
 		else
-			currentDiv /= stringToFloat;
+			currentDiv /= stringToDouble;
 	}
 
 	return currentDiv;
@@ -485,8 +487,8 @@ void helpDesk(uint8_t argNum, char* argStrings[])
 		printf("help [command] : Prints help information for a command\n");
 
 		printf("\n\n##### EXTRA FUNCTIONS #####\n");
-		printf("sqrt <num1> : Finds the square root of a floating point number.\n");
-		printf("cbrt <num1> : Finds the cube root of a floating point number.\n");
+		printf("sqrt <num1> : Finds the square root of a double precision floating point number.\n");
+		printf("cbrt <num1> : Finds the cube root of a double precision floating point number.\n");
 		printf("pow <num1> <num2> : Finds the power of the num1 to the power of num2.\n");
 		printf("mod <num1> <num2>: Finds the modulo of two INTEGERS.\n");
 
