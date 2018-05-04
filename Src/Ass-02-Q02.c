@@ -20,7 +20,7 @@ typedef struct {
 
 
 static Button buttons[20];
-char *textArray[] = {"7","8","9","+","-","4","5","6","/","*","1","2","3","sqrt","+-","0",".","clr","^","="};
+char *textArray[] = {"7","8","9","+","-","4","5","6","/","x","1","2","3","del","+-","0",".","clr","ans","="};
 
 char* inputString;
 char* outputString;
@@ -48,7 +48,7 @@ int isOperator(char);
 int maxSize = 20;
 
 float compute(char operator,char* leftNum,char* rightNum);
-
+char answer[50];
 
 
 /**************************Calculator Methods********************************/
@@ -82,9 +82,9 @@ void CalculatorInit(void)
 		  buttonToString(buttons[j*5+i]);
 	  }
   }
-
+  BSP_LCD_SetFont(&Font16);
   BSP_LCD_DisplayStringAt(20,40,"0" ,LEFT_MODE); //init calculator with 0
-
+  strcpy(answer,"0");
 //  BSP_LCD_SetFont(&Font24);
 }
 
@@ -130,7 +130,7 @@ void CalculatorProcess(void)
 	      {
 	    	  analyseTouch(currentButtonPressed);
 
-
+	    	  BSP_LCD_SetFont(&Font16);
 	      	  BSP_LCD_DisplayStringAt(20,40,inputString ,LEFT_MODE);
 
 
@@ -185,14 +185,12 @@ void showButton(Button button){
 
 	BSP_LCD_DrawRect(button.startX, button.startY, button.width, button.height);
 
-	if(strcmp(button.text, "sqrt") == 0)
-		BSP_LCD_SetFont(&Font12);
-	else
-		BSP_LCD_SetFont(&Font16);
+
+	BSP_LCD_SetFont(&Font20);
 
 
 
-	BSP_LCD_DisplayStringAt(button.startX + button.width/2,button.startY + button.height/2,button.text,CENTER_MODE);
+	BSP_LCD_DisplayStringAt(button.startX + button.width/2,button.startY + button.height/2 -8,button.text,CENTER_MODE);
 
 }
 
@@ -284,7 +282,7 @@ void analyseTouch(Button currentButtonPressed)
 
 		}
 		if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
-				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0 || strcmp(buttonText, "^")==0)
+				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "x") == 0 || strcmp(buttonText, "^")==0)
 		{
 			concatenateButtonText(buttonText);
 		}
@@ -314,7 +312,7 @@ void analyseTouch(Button currentButtonPressed)
 		}
 	}
 	else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
-			strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
+			strcmp(buttonText, "/") == 0 || strcmp(buttonText, "x") == 0)
 	{
 		printf("found +,-,/,*\n");
 
@@ -324,7 +322,7 @@ void analyseTouch(Button currentButtonPressed)
 		if((previousChar == '+' && strcmp(buttonText, "+") == 0) ||
 				(previousChar == '-' && strcmp(buttonText, "-") == 0) ||
 				(previousChar == '/' && strcmp(buttonText, "/") == 0) ||
-				(previousChar == '*' && strcmp(buttonText, "*") == 0))
+				(previousChar == 'x' && strcmp(buttonText, "x") == 0))
 		{
 			//error cant do that mate
 			printf("Error. cannot have 2 operators in a row\n");
@@ -332,27 +330,27 @@ void analyseTouch(Button currentButtonPressed)
 		}
 		//if previous char is operator and new char is operator
 		//replace old operator with new operator
-		else if((previousChar == '-' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"+") == 0)
+		else if((previousChar == '-' || previousChar == '/' || previousChar == 'x') && strcmp(buttonText,"+") == 0)
 		{
 			inputString[inputStringIndex] = '+';
 			decimalPointPlaced = 0;
 
 		}
-		else if((previousChar == '+' || previousChar == '/' || previousChar == '*') && strcmp(buttonText,"-") == 0)
+		else if((previousChar == '+' || previousChar == '/' || previousChar == 'x') && strcmp(buttonText,"-") == 0)
 		{
 			inputString[inputStringIndex] = '-';
 			decimalPointPlaced = 0;
 
 		}
-		else if((previousChar == '+' || previousChar == '-' || previousChar == '*') && strcmp(buttonText,"/") == 0)
+		else if((previousChar == '+' || previousChar == '-' || previousChar == 'x') && strcmp(buttonText,"/") == 0)
 		{
 			inputString[inputStringIndex] = '/';
 			decimalPointPlaced = 0;
 
 		}
-		else if((previousChar == '+' || previousChar == '-' || previousChar == '/') && strcmp(buttonText,"*") == 0)
+		else if((previousChar == '+' || previousChar == '-' || previousChar == '/') && strcmp(buttonText,"x") == 0)
 		{
-			inputString[inputStringIndex] = '*';
+			inputString[inputStringIndex] = 'x';
 			decimalPointPlaced = 0;
 
 		}
@@ -371,19 +369,22 @@ void analyseTouch(Button currentButtonPressed)
 	{
 		//cannot parse string if there is an operator at the end of string
 		char lastChar = inputString[inputStringIndex];
-		if(lastChar == '+' || lastChar ==  '-' || lastChar ==  '/' ||  lastChar == '*')
+		if(lastChar == '+' || lastChar ==  '-' || lastChar ==  '/' ||  lastChar == 'x')
 		{
 			printf("Error. last character is an operator. cannot do equals yet\n");
 		}
 		else
 		{
+
 			float result = doEquals2();
+
 //			float result = doEquals(); //todo get iplementation for float to string for output
 //			result ++; //todo not relevant, must be removed before submission
 //			strcpy(inputString,"0");
 			char resultString [64];
 			snprintf(resultString, sizeof(resultString), "%f",result);
 			strcpy(inputString, resultString);
+			strcpy(answer,resultString);
 			//reset variables
 
 			firstTime = 1;
@@ -480,6 +481,45 @@ void analyseTouch(Button currentButtonPressed)
 		}
 
 	}
+	else if(strcmp(buttonText , "del") == 0){
+		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+		BSP_LCD_FillRect(1, 1, 318, 78);
+		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
+		if(inputStringIndex ==0){
+			strcpy(inputString,"0");
+			firstTime = 1;
+			inputStringIndex = 0;
+			decimalPointPlaced = 0;
+
+
+		}else{
+			if(isOperator(inputString[inputStringIndex])){
+				printf("1\n");
+				//if an operator is deleted then check if the previous number has a decimal
+				int tempPos = inputStringIndex -1;
+				while(tempPos >=0 && !isOperator(inputString[tempPos])){
+					if(inputString[tempPos] == '.'){
+						printf("2\n");
+						decimalPointPlaced = 1;
+						break;
+					}
+					tempPos -=1;
+
+				}
+
+			}
+
+			inputString[inputStringIndex] = '\0';
+			inputStringIndex -=1;
+
+		}
+
+
+	}
+	else if(strcmp(buttonText , "ans") == 0){
+		concatenateButtonText(buttonText);
+	}
 	else
 	{
 		printf("Hey you pressed a button that doesnt have implementation yet\n");
@@ -511,7 +551,7 @@ float doEquals2(){
 	int numberOfOperators = 0;
 	int lookingAtNumber = 0;
 	for(int i = 0; i< (int)strlen(inputString); i++){
-		if(isOperator(inputString[i])){
+		if(isOperator(inputString[i]) && lookingAtNumber!= 0){
 			numberOfOperators +=1;
 			lookingAtNumber =0;
 		}else{
@@ -551,12 +591,26 @@ float doEquals2(){
 		if(isOperator(inputString[i])){
 			if(startI <= i-1){
 //				printf("before3\n");
-				char tempNumber[50];
+//				char tempNumber[50];
 //				char* tempNumber = (char*)malloc(sizeof(char) * (i-startI+1));
 //				printf("after3\n");
 
 				strncpy(numbers[numbersIndex], &inputString[startI],i-startI);
 				numbers[numbersIndex][i-startI] = '\0';
+				if(strcmp("ans", numbers[numbersIndex])==0){
+					strcpy(numbers[numbersIndex], answer);
+				}
+				if(strcmp("-ans", numbers[numbersIndex])==0){
+
+					strcpy(numbers[numbersIndex], "-");
+					strcat(numbers[numbersIndex], answer);
+					printf("balh %s", numbers[numbersIndex]);
+					if(numbers[numbersIndex][1] =='-'){
+						printf("answer %s\n", &answer[1]);
+						strcpy(numbers[numbersIndex], &answer[1]);
+					}
+				}
+
 //				float d;
 //				sscanf(tempNumber,"%f",&d);
 //				numbers[numbersIndex] = tempNumber;
@@ -586,6 +640,18 @@ float doEquals2(){
 
 	strncpy(numbers[numbersIndex], &inputString[startI],i-startI);
 	numbers[numbersIndex][i-startI] = '\0';
+	if(strcmp("ans", numbers[numbersIndex])==0){
+		strcpy(numbers[numbersIndex], answer);
+	}
+	if(strcmp("-ans", numbers[numbersIndex])==0){
+
+		strcpy(numbers[numbersIndex], "-");
+		strcat(numbers[numbersIndex], answer);
+		if(numbers[numbersIndex][1] =='-'){
+			strcpy(numbers[numbersIndex], &answer[1]);
+		}
+	}
+
 //	tempNumber[i-startI] ='\0';
 //				float d;
 //				sscanf(tempNumber,"%f",&d);
@@ -609,7 +675,7 @@ float doEquals2(){
 
 
 
-	char operatorOrder[2][2]= {{'*', '/'},{'+', '-'}};
+	char operatorOrder[2][2]= {{'x', '/'},{'+', '-'}};
 
 	for(int operatorGroup = 0; operatorGroup < 2; operatorGroup++){//for each operator grouping
 		for(int i = 0; i< numberOfOperators;i++){//for each operator in operator list from input string
@@ -736,7 +802,7 @@ float doEquals()
 	float result = 0;
 	printf("Parsing is kinda implemented\n");
 
-	char operators[2][2]= {{'*', '/'},{'+', '-'}};
+	char operators[2][2]= {{'x', '/'},{'+', '-'}};
 	char resultString[64];
 //	while(done == 0)
 //	{
@@ -945,7 +1011,7 @@ float compute(char operator,char* leftNum,char* rightNum){
 	float result = 0;
 	char* numbers[3] = {NULL,leftNum,rightNum};
 	switch(operator){
-	case '*':
+	case 'x':
 		numbers[0] = commandList[2].nameString;
 		result = commandList[2].function_p(3,numbers);
 		//result = mulNumbers(3,numbers);//mul [left] [right].
@@ -983,7 +1049,7 @@ float compute(char operator,char* leftNum,char* rightNum){
 
 
 int isOperator(char input ){
-	if(input == '*' || input == '/' || input == '+' || input == '-'){
+	if(input == 'x' || input == '/' || input == '+' || input == '-'){
 		return 1;
 	}
 	return 0;
