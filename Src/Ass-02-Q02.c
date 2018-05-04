@@ -211,15 +211,19 @@ void buttonToString(Button button)
 
 void analyseTouch(Button currentButtonPressed)
 {
+	printf("enter analyse touch\n");
 	//https://stackoverflow.com/a/6161123
 	if(firstTime == 1)
 	{
-		inputString = (char*)malloc(sizeof(char) * maxSize);
+		printf("1\n");
+		inputString = (char*)realloc(inputString, sizeof(char) * maxSize);
+		printf("1\n");
 		strcpy(inputString, "0");  //init
-
-
+		printf("1\n");
 		//printf("input string starts with %s", inputString);
 		firstTime = 0;
+		printf("1\n");
+
 	}
 
     if(equalsPressed == 1)
@@ -435,7 +439,7 @@ void concatenateButtonText(char* buttonText)
 float doEquals2(){
 
 	printf("Entering doEquals2()   inputString %s\n", inputString);
-
+	int originalNumberOfNumbers;
 	int numberOfNumbers = 0;
 	int numberOfOperators = 0;
 	int lookingAtNumber = 0;
@@ -451,10 +455,16 @@ float doEquals2(){
 		}
 	}
 
-
+	originalNumberOfNumbers = numberOfNumbers;
 	printf("before");
 
-	char** numbers = (char**)calloc(numberOfNumbers,sizeof(char*));
+	char numbers[numberOfNumbers][50];
+//	free(numbers[0]);
+//	free(numbers);
+
+	printf("before2");
+
+//	numbers = (char*[])calloc(numberOfNumbers,sizeof(char*));
 
 
 	printf("between");
@@ -463,9 +473,9 @@ float doEquals2(){
 		return 0;
 
 	}
+	char operators[numberOfOperators];
 
-
-	char* operators = (char*)malloc(sizeof(char) * numberOfOperators);
+//	char* operators = (char*)malloc(sizeof(char) * numberOfOperators);
 	printf("after");
 
 	int numbersIndex = 0;
@@ -474,12 +484,16 @@ float doEquals2(){
 	for(int i = 0 ;i< (int)strlen(inputString); i++){
 		if(isOperator(inputString[i])){
 			if(startI <= i-1){
-				char* tempNumber = (char*)malloc(sizeof(char) *( i-startI+1));
-				strncpy(tempNumber, &inputString[startI],i-startI);
-				tempNumber[i-startI] ='\0';
+//				printf("before3\n");
+				char tempNumber[50];
+//				char* tempNumber = (char*)malloc(sizeof(char) * (i-startI+1));
+//				printf("after3\n");
+
+				strncpy(numbers[numbersIndex], &inputString[startI],i-startI);
+				numbers[numbersIndex][i-startI] = '\0';
 //				float d;
 //				sscanf(tempNumber,"%f",&d);
-				numbers[numbersIndex] = tempNumber;
+//				numbers[numbersIndex] = tempNumber;
 				numbersIndex +=1;
 
 //				free(tempNumber);
@@ -487,6 +501,7 @@ float doEquals2(){
 
 				operators[operatorIndex] = inputString[i];
 				operatorIndex +=1;
+
 
 			}else{//if previous index was an operator as well or this is the first position then this is a minus
 			}
@@ -498,12 +513,17 @@ float doEquals2(){
 
 	//add the last number
 	int i = (int)strlen(inputString);
-	char* tempNumber = (char*)malloc(sizeof(char) *( i-startI+1));
-	strncpy(tempNumber, &inputString[startI],i-startI);
-	tempNumber[i-startI] ='\0';
-//	float d;
-//	sscanf(tempNumber,"%f",&d);
-	numbers[numbersIndex] = tempNumber;
+//	printf("before3\n");
+//	char tempNumber[50];
+//				char* tempNumber = (char*)malloc(sizeof(char) * (i-startI+1));
+	printf("after3\n");
+
+	strncpy(numbers[numbersIndex], &inputString[startI],i-startI);
+	numbers[numbersIndex][i-startI] = '\0';
+//	tempNumber[i-startI] ='\0';
+//				float d;
+//				sscanf(tempNumber,"%f",&d);
+//	numbers[numbersIndex] = tempNumber;
 	numbersIndex +=1;
 
 //	free(tempNumber);
@@ -543,12 +563,13 @@ float doEquals2(){
 //							strcpy(newNumbers[j], numbers[j]);
 
 						}else if(j==i){
-							free(numbers[j]);
+//							free(numbers[j]);
 							strcpy(numbers[j], resultString);
 	//							newNumbers[j] = resultString;
 
 						}else{
-							free(numbers[j]);
+
+//							free(numbers[j]);
 							strcpy(numbers[j], numbers[j+1]);
 
 //							newNumbers[j] = numbers[j+1];
@@ -598,12 +619,16 @@ float doEquals2(){
 						sscanf(numbers[0],"%f",&finalResult);
 						printf("finalResult %f\n", finalResult );
 
+//						for(int n = 0; n< originalNumberOfNumbers ; n++){
+//							free(numbers[n]);
+//						}
 
-						free(numbers[0]);
+//						free(numbers[0]);
 
-						free(numbers);
 
-						free(operators);
+//						free(numbers);
+
+//						free(operators);
 						return finalResult;
 					}
 
@@ -620,9 +645,13 @@ float doEquals2(){
 
 	float finalResult =0;
 	sscanf(numbers[0],"%f",&finalResult);
-	free(numbers[0]);
-	free(numbers);
-	free(operators);
+//	for(int n = 0; n< originalNumberOfNumbers ; n++){
+//		free(numbers[n]);
+//	}
+
+//	free(numbers[0]);
+//	free(numbers);
+//	free(operators);
 	return finalResult;
 
 

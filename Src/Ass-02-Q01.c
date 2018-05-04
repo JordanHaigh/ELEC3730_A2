@@ -167,13 +167,13 @@ float validateAndRunRoot(uint8_t flag, uint8_t argNum, char* argStrings[])
  * */
 float squareRoot(char* argStrings[])
 {
-	float result = atof(argStrings[1]);
+	float result = strtof(argStrings[1],NULL);
 	return sqrtf(result);
 }
 
 float cubeRoot(char* argStrings[])
 {
-	return cbrtf(atof(argStrings[1]));
+	return cbrtf(strtof(argStrings[1],NULL));
 }
 
 float validatePower(uint8_t argNum, char* argStrings[])
@@ -198,7 +198,7 @@ float validatePower(uint8_t argNum, char* argStrings[])
 
 float power(char* argStrings[])
 {
-	return powf(atof(argStrings[1]),atof(argStrings[2]));
+	return powf(strtof(argStrings[1],NULL),strtof(argStrings[2],NULL));
 }
 
 float validateModulo(uint8_t argNum, char* argStrings[])
@@ -219,7 +219,7 @@ float validateModulo(uint8_t argNum, char* argStrings[])
 
 int modulo(char* argStrings[])
 {
-	return (int)atof(argStrings[1]) % (int)atof(argStrings[2]);
+	return (int)strtof(argStrings[1],NULL) % (int)strtof(argStrings[2],NULL);
 }
 
 uint8_t checkArgumentLength2(uint8_t flag, uint8_t expectedWordCount, uint8_t argNum)
@@ -306,7 +306,7 @@ float addNumbers(uint8_t argNum, char* argStrings[])
 
 	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = atof(argStrings[i]);
+		float stringToFloat = strtof(argStrings[i],NULL);
 		currentSum += stringToFloat;
 	}
 
@@ -335,7 +335,7 @@ float subNumbers(uint8_t argNum, char* argStrings[])
 	uint8_t firstRun = 1;
 	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = atof((argStrings)[i]);
+		float stringToFloat = strtof(argStrings[i],NULL);
 
 		if(firstRun == 1)
 		{
@@ -376,7 +376,7 @@ float mulNumbers(uint8_t argNum, char* argStrings[])
 		float stringToFloat = 0;
 		sscanf(argStrings[i],"%f",&stringToFloat);
 
-		//float stringToFloat = atof((argStrings)[i]);
+		//float stringToFloat = strtof((argStrings)[i]);
 
 		if(firstTime)
 		{
@@ -413,7 +413,7 @@ float divNumbers(uint8_t argNum, char* argStrings[])
 	uint8_t firstRun = 1;
 	for(int i = 1; i < argNum; i++)
 	{
-		float stringToFloat = atof((argStrings)[i]);
+		float stringToFloat = strtof((argStrings)[i],NULL);
 		if(stringToFloat == 0.0)
 		{
 			return 0.0; //it was always going to be a 0.0 result regardless
