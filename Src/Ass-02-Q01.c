@@ -262,7 +262,7 @@ uint8_t checkForNumericArgument2(uint8_t processingIntegerFlag,uint8_t argNum, c
 				}
 			}
 
-			else if(!(argStrings[i][j] >= 48 && argStrings[i][j] <= 57)) //if the number is not within 0-9 (non numeric)
+			else if(!(argStrings[i][j] >= 48 && argStrings[i][j] <= 57) && !argStrings[i][j] == '-') //if the number is not within 0-9 (non numeric)
 			{
 				printf("Error. Not a valid input\n");
 				return 0;

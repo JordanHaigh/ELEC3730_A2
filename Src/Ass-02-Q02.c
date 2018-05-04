@@ -20,7 +20,7 @@ typedef struct {
 
 
 static Button buttons[20];
-char *textArray[] = {"7","8","9","+","-","4","5","6","/","*","1","2","3","sqrt","+-","0",".","clr","pow","="};
+char *textArray[] = {"7","8","9","+","-","4","5","6","/","*","1","2","3","sqrt","+-","0",".","clr","^","="};
 
 char* inputString;
 char* outputString;
@@ -130,6 +130,7 @@ void CalculatorProcess(void)
 	      {
 	    	  analyseTouch(currentButtonPressed);
 
+
 	      	  BSP_LCD_DisplayStringAt(20,40,inputString ,LEFT_MODE);
 
 
@@ -229,7 +230,7 @@ void analyseTouch(Button currentButtonPressed)
     if(equalsPressed == 1)
     {
 		equalsPressed = 0;
-		strcpy(inputString,""); //reset input string
+		strcpy(inputString,"0"); //reset input string
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 		BSP_LCD_FillRect(1, 1, 318, 78);
 		//revert to black text
@@ -283,7 +284,7 @@ void analyseTouch(Button currentButtonPressed)
 
 		}
 		if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
-				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0)
+				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0 || strcmp(buttonText, "^"))
 		{
 			concatenateButtonText(buttonText);
 		}
@@ -410,6 +411,35 @@ void analyseTouch(Button currentButtonPressed)
 		BSP_LCD_FillRect(1, 1, 318, 78);
 		//revert to black text
 		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
+	}
+	else if(strcmp(buttonText , "+-") == 0)
+	{
+		if(inputString[inputStringIndex] == '-' && (inputStringIndex ==0  || isOperator(inputString[inputStringIndex-1]))){
+			//the minus we are looking at is for negating a number\
+			//so we need to remove it
+			inputString[inputStringIndex] = '\0';
+			inputStringIndex -=1;
+			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+			BSP_LCD_FillRect(1, 1, 318, 78);
+			//revert to black text
+			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
+
+		}else if(inputStringIndex !=0 && !isOperator(inputString[inputStringIndex])){
+			//the minus needs to be before a number, therefore it needs to be after an operator(or at the start of the string)
+			//so error
+			printf("inputStringIndex %d\n", inputStringIndex);
+			printf("previous %c\n", inputString[inputStringIndex]);
+			printf("Error. negative sign needs to be placed before a number\n");
+			return;
+
+		}else{//in every other case we good
+
+			concatenateButtonText("-");
+
+
+		}
 
 	}
 	else
