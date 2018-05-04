@@ -101,7 +101,7 @@ void CalculatorProcess(void)
   {
 	  //printf("Bouncing..\n");
 	  bounce++;
-	  if(bounce == 25)
+	  if(bounce == 40)
 	  {
 		  printf("Finger on..\n");
 		  fingerTouching = 1;
@@ -284,7 +284,7 @@ void analyseTouch(Button currentButtonPressed)
 
 		}
 		if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
-				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0 || strcmp(buttonText, "^"))
+				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "*") == 0 || strcmp(buttonText, "^")==0)
 		{
 			concatenateButtonText(buttonText);
 		}
@@ -426,13 +426,51 @@ void analyseTouch(Button currentButtonPressed)
 			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 
 
-		}else if(inputStringIndex !=0 && !isOperator(inputString[inputStringIndex])){
+		}else if(!isOperator(inputString[inputStringIndex])){
 			//the minus needs to be before a number, therefore it needs to be after an operator(or at the start of the string)
 			//so error
-			printf("inputStringIndex %d\n", inputStringIndex);
-			printf("previous %c\n", inputString[inputStringIndex]);
-			printf("Error. negative sign needs to be placed before a number\n");
-			return;
+			//instead of error we need to continue back until the start of the number then insert it there
+			int tempPos = inputStringIndex-1;
+			while(tempPos >=0 && !isOperator(inputString[tempPos])){
+				printf("tempPos %d\n", tempPos);
+				tempPos-=1;
+			}
+			printf("final tempPos %d\n", tempPos);
+
+			if(tempPos >=0 && (tempPos ==0 || isOperator(inputString[tempPos-1]))){//if the number is negative
+				//take out minus
+				for(int i = tempPos ; i< inputStringIndex; i++){
+					inputString[i] = inputString[i+1];
+				}
+				inputString[inputStringIndex] = '\0';
+				inputStringIndex -=1;
+				BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+				BSP_LCD_FillRect(1, 1, 318, 78);
+				//revert to black text
+				BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
+
+
+			}else{
+				//now temp pos is pointing to the position in the array before the current number (hopefully)
+				//todo check for size
+				//shift everything forward
+				for(int i = inputStringIndex; i>tempPos; i--){
+					inputString[i+1] = inputString[i];
+				}
+				inputString[tempPos+1] = '-';
+				inputStringIndex +=1;
+
+				inputString[inputStringIndex+1] = '\0';
+
+			}
+
+
+
+//			printf("inputStringIndex %d\n", inputStringIndex);
+//			printf("previous %c\n", inputString[inputStringIndex]);
+//			printf("Error. negative sign needs to be placed before a number\n");
+//			return;
 
 		}else{//in every other case we good
 
@@ -469,7 +507,6 @@ void concatenateButtonText(char* buttonText)
 float doEquals2(){
 
 	printf("Entering doEquals2()   inputString %s\n", inputString);
-	int originalNumberOfNumbers;
 	int numberOfNumbers = 0;
 	int numberOfOperators = 0;
 	int lookingAtNumber = 0;
@@ -485,7 +522,6 @@ float doEquals2(){
 		}
 	}
 
-	originalNumberOfNumbers = numberOfNumbers;
 	printf("before");
 
 	char numbers[numberOfNumbers][50];
