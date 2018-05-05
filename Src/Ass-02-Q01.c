@@ -475,11 +475,17 @@ double divNumbers(uint8_t argNum, char* argStrings[])
 {
 	double currentDiv = 0;
 	uint8_t firstRun = 1;
+	if(argStrings[2] == "0"){
+		printf("Error cannot divide by 0\n");
+		return 0;
+
+	}
 	for(int i = 1; i < argNum; i++)
 	{
 		double stringToDouble = strtof((argStrings)[i],NULL);
 		if(stringToDouble == 0.0)
 		{
+
 			return 0.0; //it was always going to be a 0.0 result regardless - smart boy
 			//gets around the divide by zero exception
 		}

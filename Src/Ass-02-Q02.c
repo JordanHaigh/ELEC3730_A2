@@ -25,7 +25,7 @@ typedef struct {
 
 static Button buttons[20]; //Needed for many loops of calculator
 //Text array used for buttons - determined by button id
-char *textArray[] = {"7","8","9","+","-","4","5","6","/","x","1","2","3","del","+-","0",".","clr","ans","="};
+char *textArray[] = {"7","8","9","del","clr","4","5","6","+","-","1","2","3","/","x","0",".","+-","ans","="};
 
 char* inputString; //input string from user
 char* outputString; //output displayed to interface
@@ -300,17 +300,17 @@ void analyseTouch(Button currentButtonPressed)
 			if(debugOn ==1)printf("0 was entered. Nothing to achieve on blank string\n");
 			//return;
 		}
-		if(strcmp(buttonText, "=") == 0)
+		else if(strcmp(buttonText, "=") == 0)
 		{
 			if(debugOn ==1)printf("= was entered. Nothing to achieve on blank string\n");
 			//return;
 		}
-		if(strcmp(buttonText, "clr") == 0)
+		else if(strcmp(buttonText, "clr") == 0)
 		{
 			if(debugOn ==1)printf("clr was entered. Nothing to achieve on blank string\n");
 			//return;
 		}
-		if(strcmp(buttonText, "1") == 0 ||strcmp(buttonText, "2") == 0 || strcmp(buttonText, "3") == 0 ||
+		else if(strcmp(buttonText, "1") == 0 ||strcmp(buttonText, "2") == 0 || strcmp(buttonText, "3") == 0 ||
 				strcmp(buttonText, "4") == 0 ||strcmp(buttonText, "5") == 0 || strcmp(buttonText, "6") == 0 ||
 				strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 || strcmp(buttonText, "9") == 0)
 		{
@@ -318,18 +318,30 @@ void analyseTouch(Button currentButtonPressed)
 			if(debugOn ==1)printf("found %s. replacing current 0\n", buttonText);
 			strcpy(inputString, buttonText);
 		}
-
-		if(strcmp(buttonText, ".") == 0)
+		else if(strcmp(buttonText, ".") == 0)
 		{
 			concatenateButtonText(buttonText);
 			decimalPointPlaced = 1;
 
 
 		}
-		if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
-				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "x") == 0 || strcmp(buttonText, "^")==0)
+		else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
+				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "x") == 0)
 		{
 			concatenateButtonText(buttonText);
+		}
+		else if(strcmp(buttonText, "ans")==0)
+		{
+			strcpy(inputString, buttonText);
+			inputStringIndex =2;
+//			concatenateButtonText(buttonText);
+
+
+		}else if(strcmp(buttonText, "+-") == 0){
+			strcpy(inputString, "-0");
+			inputStringIndex =2;
+
+
 		}
 
 	}
@@ -341,13 +353,21 @@ void analyseTouch(Button currentButtonPressed)
 			strcmp(buttonText, "9") == 0)
 	{
 		//append to end of string
-		concatenateButtonText(buttonText);
+		if(inputString[inputStringIndex] == 's'){
+			printf("Error can't append a number to answer\n");
+		}else{
+			concatenateButtonText(buttonText);
+		}
 	}
 	//If decimal point entered
 	else if(strcmp(buttonText, ".") == 0)
 	{
 		//make sure there isnt a decimal point already placed
-		if(decimalPointPlaced == 0)
+		if(inputString[inputStringIndex] == 's'){
+			printf("Error cannot append decimal point to answer\n");
+
+		}
+		else if(decimalPointPlaced == 0)
 		{
 			//go for it
 			concatenateButtonText(buttonText);
@@ -557,6 +577,14 @@ void analyseTouch(Button currentButtonPressed)
 
 				}
 
+			}else if(inputString[inputStringIndex] == '.'){
+				decimalPointPlaced =0;
+
+			}else if(inputString[inputStringIndex] == 's'){
+				inputString[inputStringIndex] = '\0';
+				inputStringIndex -=1;
+				inputString[inputStringIndex] = '\0';
+				inputStringIndex -=1;
 			}
 
 			inputString[inputStringIndex] = '\0';
@@ -568,7 +596,12 @@ void analyseTouch(Button currentButtonPressed)
 
 	}
 	else if(strcmp(buttonText , "ans") == 0){
-		concatenateButtonText(buttonText); //todo need to fix this
+		if(isOperator(inputString[inputStringIndex])){
+			concatenateButtonText(buttonText);
+		}else{
+			printf("Error can't append answer to a number\n");
+
+		}
 	}
 	else
 	{
