@@ -53,7 +53,7 @@ int isOperator(char);
 int maxSize = 20;
 
 double compute(char operator,char* leftNum,char* rightNum);
-char answer[50]; //Getting around malloc bullshit - Other demonstrator (He took over from Lyall for Thurs 2-4pm Week 8)
+char answer[50]; //Getting around malloc bullshit - Other demonstrator (He took over from Lyall for Fri 2-4pm Week 8)
 //instructed us to use static arrays rather than malloc for our answers
 
 
@@ -428,7 +428,7 @@ void analyseTouch(Button currentButtonPressed)
 
 //			strcpy(inputString,"0");
 			char resultString [64];
-			snprintf(resultString, sizeof(resultString), "%lf",result);
+			snprintf(resultString, sizeof(resultString), "%.9lg",result);
 			strcpy(inputString, resultString);
 			strcpy(answer,resultString);
 			//reset variables
@@ -670,7 +670,7 @@ double doEquals2(){
 				}
 
 //				double d;
-//				sscanf(tempNumber,"%lf",&d);
+//				sscanf(tempNumber,"%.9lg",&d);
 //				numbers[numbersIndex] = tempNumber;
 				numbersIndex +=1;
 
@@ -714,7 +714,7 @@ double doEquals2(){
 
 //	tempNumber[i-startI] ='\0';
 //				double d;
-//				sscanf(tempNumber,"%lf",&d);
+//				sscanf(tempNumber,"%.9lg",&d);
 //	numbers[numbersIndex] = tempNumber;
 	numbersIndex +=1;
 
@@ -746,7 +746,7 @@ double doEquals2(){
 					double result = 0;
 					char resultString[64]; //better than using malloc. fuck malloc
 					result = compute(operators[i],numbers[i], numbers[i+1]);
-					snprintf(resultString, sizeof(resultString), "%lf",result);
+					snprintf(resultString, sizeof(resultString), "%.9lg",result);
 					if(debugOn ==1)printf("left Number: %s \t operator: %c \t right Number: %s \t result: %s \n", numbers[i], operators[i], numbers[i+1], resultString);
 
 
@@ -809,8 +809,8 @@ double doEquals2(){
 
 					if(numberOfOperators ==0){
 						double finalResult =0;
-						sscanf(numbers[0],"%lf",&finalResult);
-						if(debugOn ==1)printf("finalResult %lf\n", finalResult );
+						sscanf(numbers[0],"%lg",&finalResult);
+						if(debugOn ==1)printf("finalResult %.9lg\n", finalResult );
 
 //						for(int n = 0; n< originalNumberOfNumbers ; n++){
 //							free(numbers[n]);
@@ -837,7 +837,7 @@ double doEquals2(){
 
 
 	double finalResult =0;
-	sscanf(numbers[0],"%lf",&finalResult);
+	sscanf(numbers[0],"%lg",&finalResult);
 //	for(int n = 0; n< originalNumberOfNumbers ; n++){
 //		free(numbers[n]);
 //	}

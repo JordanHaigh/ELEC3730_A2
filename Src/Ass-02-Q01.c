@@ -155,7 +155,7 @@ double validateAndRunRoot(uint8_t flag, uint8_t argNum, char* argStrings[])
 			else //Flag for calculating cube root
 				result = cubeRoot(argStrings);
 
-			printf("Result: %.2f\n", result); //Print result to putty/command line
+			printf("Result: %lg\n", result); //Print result to putty/command line
 		}
 	}
 
@@ -197,7 +197,7 @@ double validatePower(uint8_t argNum, char* argStrings[])
 		{
 
 			result = power(argStrings);
-			printf("Result: %.2f\n", result);
+			printf("Result: %lg\n", result);
 		}
 	}
  	return result;
@@ -225,7 +225,7 @@ double validateModulo(uint8_t argNum, char* argStrings[])
 		if(checkForNumericArgument2(1,argNum,argStrings) == 1)
 		{
 			result = modulo(argStrings);
-			printf("Result: %.2f\n", result);
+			printf("Result: %lg\n", result);
 		}
 	}
 	return result;
@@ -324,7 +324,7 @@ double validateAddition(uint8_t argNum, char* argStrings[])
 		if(checkForNumericArgument2(0,argNum,argStrings) == 1)
 		{
 			result = addNumbers(argNum, argStrings);
-			printf("Result: %.2f\n", result);
+			printf("Result: %lg\n", result);
 		}
 	}
 	return result;
@@ -361,7 +361,7 @@ double validateSubtraction(uint8_t argNum, char* argStrings[])
 		if(checkForNumericArgument2(0,argNum, argStrings) == 1)
 		{
 			result = subNumbers(argNum, argStrings);
-			printf("Result: %.2f\n", result);
+			printf("Result: %lg\n", result);
 		}
 	}
 	return result;
@@ -407,7 +407,7 @@ double validateMultiplication(uint8_t argNum, char* argStrings[])
 		if(checkForNumericArgument2(0,argNum,argStrings) == 1)
 		{
 			result = mulNumbers(argNum, argStrings);
-			printf("Result: %.2f\n", result);
+			printf("Result: %lg\n", result);
 		}
 
 	}
@@ -426,8 +426,8 @@ double mulNumbers(uint8_t argNum, char* argStrings[])
 	for(int i = 1; i < argNum; i++)
 	{
 		double stringToDouble = 0;
-		sscanf(argStrings[i],"%lf",&stringToDouble);
-		//printf("In mul - number to mul is %lf\n", stringToDouble);
+		sscanf(argStrings[i],"%lg",&stringToDouble);
+		//printf("In mul - number to mul is %lg\n", stringToDouble);
 
 
 		//double stringToDouble = strtof((argStrings)[i]);
@@ -441,7 +441,8 @@ double mulNumbers(uint8_t argNum, char* argStrings[])
 		else
 			currentMul *= stringToDouble;
 	}
-	//printf("Current myl is %lf\n", currentMul);
+	//printf("Current myl is %lg\n", currentMul);
+
 	return currentMul;
 }
 
@@ -459,7 +460,7 @@ double validateDivision(uint8_t argNum, char* argStrings[])
 		if(checkForNumericArgument2(0,argNum,argStrings) == 1)
 		{
 			result = divNumbers(argNum,argStrings);
-			printf("Result: %.2f\n", result);
+			printf("Result: %lg\n", result);
 		}
 	}
 	return result;
