@@ -1,34 +1,39 @@
-//     $Date: 2018-03-26 08:32:18 +1100 (Mon, 26 Mar 2018) $
-// $Revision: 1217 $
-//   $Author: Peter $
-
+/**
+ * ELEC3730 ASSIGNMENT 2
+ * QUESTION 2 - CALCULATOR INTERFACE
+ * JORDAN HAIGH AND EVAN GRESHAM
+ *
+ * File takes in user input either from STM32 (Putty) or command line
+ * Utilises keywords to perform mathematical functions
+ * */
 #include "Ass-02.h"
 
 #include "Ass-02-Q01.h"
 
 #include <stdlib.h>
 
+//Button struct necessary for multiple buttons - Form of encapsulating
 typedef struct {
 	  int startX;
 	  int startY;
 	  int width;
 	  int height;
-	  int buttonPressed;
 	  char* text;
 	  int id;
 }Button;
 
 
-static Button buttons[20];
+static Button buttons[20]; //Needed for many loops of calculator
+//Text array used for buttons - determined by button id
 char *textArray[] = {"7","8","9","+","-","4","5","6","/","x","1","2","3","del","+-","0",".","clr","ans","="};
 
-char* inputString;
-char* outputString;
+char* inputString; //input string from user
+char* outputString; //output displayed to interface
 
-static int inputStringIndex = 0;
-static int decimalPointPlaced = 0;
-static int firstTime = 1;
-static int equalsPressed = 0;
+static int inputStringIndex = 0; //current position of index of string
+static int decimalPointPlaced = 0; //limiter for decimal point
+static int firstTime = 1; //Used in analyse touch
+static int equalsPressed = 0; //Used when outputting to screen that will result will stay till user input again
 
 
 void CalculatorInit(void);
@@ -41,19 +46,24 @@ void buttonToString(Button button);
 
 void analyseTouch(Button currentButtonPressed);
 void concatenateButtonText(char* buttonText);
-double doEquals();
+//double doEquals();
 double doEquals2();
 
 int isOperator(char);
 int maxSize = 20;
 
 double compute(char operator,char* leftNum,char* rightNum);
-char answer[50];
+char answer[50]; //Getting around malloc bullshit - Other demonstrator (He took over from Lyall for Thurs 2-4pm Week 8)
+//instructed us to use static arrays rather than malloc for our answers
 
 
 /**************************Calculator Methods********************************/
 
-
+/*
+ * Initialise calculator methods
+ * Set up touch display and begin calibration
+ * build buttons and display to screen
+ * */
 void CalculatorInit(void)
 {
   //Assume horizontal display
@@ -82,16 +92,22 @@ void CalculatorInit(void)
 		  buttonToString(buttons[j*5+i]);
 	  }
   }
+  //Display outputstring in bar at top
   BSP_LCD_SetFont(&Font16);
   BSP_LCD_DisplayStringAt(20,40,"0" ,LEFT_MODE); //init calculator with 0
   strcpy(answer,"0");
-//  BSP_LCD_SetFont(&Font24);
 }
 
+
+/*
+ * Constant looping method to gather information from user touch
+ * */
 void CalculatorProcess(void)
 {
   //Assume horizontal display
 
+  //Variables used for debouncing issue
+	//Debouncing is not perfect, but good enough for purpose of assignment
   static uint8_t fingerTouching = 0;
   static uint8_t bounce = 0;
   static uint8_t offBounce = 0;
@@ -99,10 +115,10 @@ void CalculatorProcess(void)
   //Now determine which button was pressed on touch screen
   if(BSP_TP_GetDisplayPoint(&display) == 0 && fingerTouching == 0)//0 means valid point on LCD. 1 otherwise(bad coordinate or dodgy LCD)
   {
-	  //printf("Bouncing..\n");
 	  bounce++;
 	  if(bounce == 40)
 	  {
+		  //Once bounced for 40, NOW it realises there is a finer press
 		  if(debugOn ==1)printf("Finger on..\n");
 		  fingerTouching = 1;
 		  bounce = 0;
@@ -113,6 +129,7 @@ void CalculatorProcess(void)
 		  currentButtonPressed.text = "OUTPUT BAR- NOT A BUTTON";
 		  currentButtonPressed.id = 999;
 
+		  //go through button array and figure out which button was being pressed
 		  for(int i = 0; i < 20;i++)
 		  {
 			  if(buttonHere(display.x, display.y, buttons[i])!= -1)
@@ -128,33 +145,33 @@ void CalculatorProcess(void)
 
 	      if(currentButtonPressed.id != 999)
 	      {
+	    	  //Button pressed was a valid button and not the output bar
 	    	  analyseTouch(currentButtonPressed);
 
+	    	  //Reset the font and display the answer at the top of the screen
 	    	  BSP_LCD_SetFont(&Font16);
 	      	  BSP_LCD_DisplayStringAt(20,40,inputString ,LEFT_MODE);
-
-
-
 	      }
-
 	  }
   }
   else if(BSP_TP_GetDisplayPoint(&display) == 1)
   {
-	  offBounce++;
+	  //Finger is not touching the screen
+
+	  offBounce++; //new bouncing variable
 	  if(offBounce == 25)
 	  {
 		  fingerTouching = 0;
 		  //printf("Finger off..\n");
-
 	  }
-
   }
-
 }
 
 /**************************Button Methods********************************/
 
+/*
+ * Initialise buttons with startx, starty, width and height. allocate text depending on id that is given
+ * */
 Button buildButton(int x , int y, int w, int h, int id){
 	Button b;
 	b.startX = x;
@@ -168,6 +185,11 @@ Button buildButton(int x , int y, int w, int h, int id){
 	return b;
 }
 
+/*
+ * Determine if a button is being pressed at the x y input coordinates
+ * If it is able to determine the button that is being pressed, it will return its id
+ * Otherwise return -1
+ * */
 int buttonHere(int x, int y, Button button)
 {
 	//returns the button id or -1
@@ -180,20 +202,20 @@ int buttonHere(int x, int y, Button button)
 		return -1;
 }
 
-
+/*
+ * Show button on LCD Screen
+ * */
 void showButton(Button button){
 
 	BSP_LCD_DrawRect(button.startX, button.startY, button.width, button.height);
-
-
 	BSP_LCD_SetFont(&Font20);
-
-
-
 	BSP_LCD_DisplayStringAt(button.startX + button.width/2,button.startY + button.height/2 -8,button.text,CENTER_MODE);
-
 }
 
+
+/*
+ * Print all button information to string
+ * */
 void buttonToString(Button button)
 {
 	if(debugOn == 1)
@@ -212,6 +234,20 @@ void buttonToString(Button button)
 
 /************************************************************************/
 
+/*
+ * Main analysis method
+ * Does plethora of checks
+ * If input string is blank -
+ * 		If decimal point inputted - extends string
+* 		If 0-9 inputted - replaced current string with number
+* 		If +,-,/,* inputted, extends string
+* 		If +- inputted, does nothing
+* 		If clr, equals, del inputted - do nothing
+* 	If input string not blank
+* 		- If decimal point - make sure previous char is not operator
+* 		 - if 0-9 extend string
+* 		 if  +,-/,* inputted - make sure that previous char is number. if previous char is oeprator, update that operator
+ * */
 void analyseTouch(Button currentButtonPressed)
 {
 	if(debugOn ==1)printf("enter analyse touch\n");
@@ -229,6 +265,7 @@ void analyseTouch(Button currentButtonPressed)
 
 	}
 
+	//In the event that we have pressed equals and keep displaying answer until next button press
     if(equalsPressed == 1)
     {
 		equalsPressed = 0;
@@ -249,6 +286,8 @@ void analyseTouch(Button currentButtonPressed)
 //	printf("sizeof inputstring %d\n", sizeof(inputString));
 //	printf("strlen inputString %d\n\n", strlen(inputString));
 
+
+	///If working with a blank string
 	if(strlen(inputString) == 1 && inputString[0] == '0') //Length 1 and only "0"
 	{
 		//blank string
@@ -292,6 +331,8 @@ void analyseTouch(Button currentButtonPressed)
 		}
 
 	}
+
+	//Not a blank string and we enter in a number
 	else if(strcmp(buttonText, "0") == 0 || strcmp(buttonText, "1") == 0 || strcmp(buttonText, "2") == 0 ||
 			strcmp(buttonText, "3") == 0 || strcmp(buttonText, "4") == 0 || strcmp(buttonText, "5") == 0 ||
 			strcmp(buttonText, "6") == 0 || strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 ||
@@ -300,6 +341,7 @@ void analyseTouch(Button currentButtonPressed)
 		//append to end of string
 		concatenateButtonText(buttonText);
 	}
+	//If decimal point entered
 	else if(strcmp(buttonText, ".") == 0)
 	{
 		//make sure there isnt a decimal point already placed
@@ -315,9 +357,12 @@ void analyseTouch(Button currentButtonPressed)
 			//return;
 		}
 	}
+	//If operation entered
 	else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
 			strcmp(buttonText, "/") == 0 || strcmp(buttonText, "x") == 0)
 	{
+
+		//need to check if last char was operator ornumber
 		if(debugOn ==1)printf("found +,-,/,*\n");
 
 		char previousChar = inputString[inputStringIndex];
@@ -358,7 +403,6 @@ void analyseTouch(Button currentButtonPressed)
 			decimalPointPlaced = 0;
 
 		}
-		//todo missing functionality for pow, mod sqrt etc.
 		else //add like normal
 		{
 			//last char was not an operator
@@ -382,8 +426,6 @@ void analyseTouch(Button currentButtonPressed)
 
 			double result = doEquals2();
 
-//			double result = doEquals(); //todo get iplementation for double to string for output
-//			result ++; //todo not relevant, must be removed before submission
 //			strcpy(inputString,"0");
 			char resultString [64];
 			snprintf(resultString, sizeof(resultString), "%lf",result);
@@ -505,7 +547,7 @@ void analyseTouch(Button currentButtonPressed)
 				while(tempPos >=0 && !isOperator(inputString[tempPos])){
 					if(inputString[tempPos] == '.'){
 						//printf("2\n");
-						decimalPointPlaced = 1;
+						decimalPointPlaced = 1; //todo should this be 0?
 						break;
 					}
 					tempPos -=1;
@@ -522,7 +564,7 @@ void analyseTouch(Button currentButtonPressed)
 
 	}
 	else if(strcmp(buttonText , "ans") == 0){
-		concatenateButtonText(buttonText);
+		concatenateButtonText(buttonText); //todo need to fix this
 	}
 	else
 	{
@@ -532,10 +574,12 @@ void analyseTouch(Button currentButtonPressed)
 	if(debugOn ==1)printf("Current String=> %s\n", inputString);
 }
 
+/*
+ * Adds button text to the input string
+ * updates size of inputstring if necessary and input string index
+ * */
 void concatenateButtonText(char* buttonText)
 {
-
-
 	if(inputStringIndex + 3 >= maxSize){
 		maxSize *= 2;
 		inputString = (char*)realloc(inputString, maxSize*sizeof(char));
@@ -547,13 +591,18 @@ void concatenateButtonText(char* buttonText)
 
 }
 
-
+/*
+ * Parseing of equation
+ *
+ * */
 double doEquals2(){
 
 	if(debugOn ==1)printf("Entering doEquals2()   inputString %s\n", inputString);
 	int numberOfNumbers = 0;
 	int numberOfOperators = 0;
 	int lookingAtNumber = 0;
+
+	//iterate through entire string and find number of operators
 	for(int i = 0; i< (int)strlen(inputString); i++){
 		if(isOperator(inputString[i]) && lookingAtNumber!= 0){
 			numberOfOperators +=1;
@@ -568,6 +617,7 @@ double doEquals2(){
 
 	//printf("before");
 
+	//now we can allocate how many numbers we found in the input string
 	char numbers[numberOfNumbers][50];
 //	free(numbers[0]);
 //	free(numbers);
@@ -583,14 +633,18 @@ double doEquals2(){
 		return 0;
 
 	}
+
+	//allocate how many operators we found
 	char operators[numberOfOperators];
 
 //	char* operators = (char*)malloc(sizeof(char) * numberOfOperators);
 	//printf("after");
 
+	//iterate through input string again, this time determining the indexes of number and operator
 	int numbersIndex = 0;
 	int operatorIndex = 0;
 	int startI = 0;
+
 	for(int i = 0 ;i< (int)strlen(inputString); i++){
 		if(isOperator(inputString[i])){
 			if(startI <= i-1){
@@ -642,6 +696,8 @@ double doEquals2(){
 //				char* tempNumber = (char*)malloc(sizeof(char) * (i-startI+1));
 //	printf("after3\n");
 
+
+	//add the current number from the input string to the numbers array
 	strncpy(numbers[numbersIndex], &inputString[startI],i-startI);
 	numbers[numbersIndex][i-startI] = '\0';
 	if(strcmp("ans", numbers[numbersIndex])==0){
@@ -665,7 +721,7 @@ double doEquals2(){
 //	free(tempNumber);
 
 
-	//print stuff
+	//print information
 	if(debugOn == 1)printf("numberOfNumbers %d  numberOfOperators %d\n",numberOfNumbers, numberOfOperators);
 	for(int i = 0 ; i< numberOfNumbers;i++){
 		if(debugOn ==1)printf("numbers %d : %s\n", i,numbers[i]);
@@ -679,6 +735,7 @@ double doEquals2(){
 
 
 
+	//order of operations. we're not doing brackets
 	char operatorOrder[2][2]= {{'x', '/'},{'+', '-'}};
 
 	for(int operatorGroup = 0; operatorGroup < 2; operatorGroup++){//for each operator grouping
@@ -687,7 +744,7 @@ double doEquals2(){
 				if(operators[i] == operatorOrder[operatorGroup][specificOperator]){
 					//if operator found which matches the one we are looking at
 					double result = 0;
-					char resultString[64];
+					char resultString[64]; //better than using malloc. fuck malloc
 					result = compute(operators[i],numbers[i], numbers[i+1]);
 					snprintf(resultString, sizeof(resultString), "%lf",result);
 					if(debugOn ==1)printf("left Number: %s \t operator: %c \t right Number: %s \t result: %s \n", numbers[i], operators[i], numbers[i+1], resultString);
@@ -794,203 +851,9 @@ double doEquals2(){
 
 }
 
-
-double doEquals()
-{
-	//int done = 0;
-	int stringIsAllNumbers = 1;
-	int memorySize = 20;
-	char* newString;
-	newString = malloc(sizeof(char) * 1);
-	strcpy(newString, "");  //init
-	double result = 0;
-	//printf("Parsing is kinda implemented\n");
-
-	char operators[2][2]= {{'x', '/'},{'+', '-'}};
-	char resultString[64];
-//	while(done == 0)
-//	{
-//		printf("looping...\n");
-		for(int i = 0 ; i < 2; i++)
-		{
-			//for(int j = 0 ; j<inputStringIndex + 1 ; j++ )
-			for(int j = 0; j <= (int)strlen(inputString);j++)
-			{
-				for(int k = 0 ; k< 2;k++)
-				{
-					if(operators[i][k] == inputString[j])
-					{
-	//					printf("input string at 1 %s\n", inputString);
-
-						if(debugOn ==1)printf("found operator %c\n" , inputString[j]);
-						int leftCounter = 1;
-						while(j-leftCounter >= 0 && !isOperator(inputString[j-leftCounter]))
-						{
-							leftCounter+=1;
-						}
-						if(leftCounter == 1){
-							for(int z = j+1; z < (int)strlen(inputString); z++){
-								if(isOperator(inputString[z])){
-									j = z;
-									int leftCounter = 1;
-									while(j-leftCounter >= 0 && !isOperator(inputString[j-leftCounter]))
-									{
-										leftCounter+=1;
-									}
-									break;
-
-
-								}
-
-							}
-
-						}
-						if(leftCounter ==1){
-							return result;
-
-						}
-
-						int rightCounter = 1;
-
-	//					while(j+rightCounter < inputStringIndex + 1 && !isOperator(inputString[j+rightCounter]))
-						while(j+rightCounter < (int)strlen(inputString) && !(isOperator(inputString[j+rightCounter]) && rightCounter != 1))
-						{
-							rightCounter+=1;
-						}
-
-
-
-
-	//					printf("input string at 3 %s", inputString);
-
-						if(debugOn ==1)printf("Left %d, Right %d, j %d\n", leftCounter, rightCounter , j);
-
-
-	//					printf("inputString before %s\n", inputString);
-
-
-
-						char* leftNum = (char*)malloc(sizeof(char) * (leftCounter-1));
-						//printf("1");
-						strcpy(leftNum, "");  //init
-					//	printf("1");
-						strncat(leftNum, &inputString[j-leftCounter+1], leftCounter -1);
-					//	printf("1");
-						char* rightNum = (char*)malloc(sizeof(char) * (rightCounter-1));
-					//	printf("1");
-						strcpy(rightNum, "");  //init
-					//	printf("1");
-						strncat(rightNum, &inputString[j +1], rightCounter -1);
-
-						if(debugOn ==1)printf("inputString %s\n", inputString);
-						if(debugOn ==1)printf("rightNum %s\n", rightNum);
-						if(debugOn ==1)printf("leftNum %s\n\n", leftNum);
-
-						result = compute(operators[i][k],leftNum,rightNum);
-						snprintf(resultString, sizeof(resultString), "%lf",result);
-
-						char* fixedString = (char*)malloc(sizeof(char));
-						strcpy(fixedString, "");
-						int fixedStringIndex = 0;
-
-						for(int z = 0; z <= j-leftCounter;z++)
-						{
-							fixedString[fixedStringIndex] = inputString[z];
-							fixedStringIndex++;
-							if(fixedStringIndex == memorySize)
-							{
-								memorySize *= 2;
-								fixedString = (char*)realloc(fixedString,sizeof(char) * memorySize);
-
-							}
-						}
-						snprintf(resultString, sizeof(resultString), "%lf", result);
-
-						for(int z = 0; resultString[z] != '\0';z++)
-						{
-							fixedString[fixedStringIndex] = resultString[z];
-							fixedStringIndex++;
-							if(fixedStringIndex == memorySize)
-							{
-								memorySize *= 2;
-								fixedString = (char*)realloc(fixedString,sizeof(char) * memorySize);
-
-							}
-						}
-
-						for(int z = j + rightCounter; z < (int)strlen(inputString);z++)
-						{
-							fixedString[fixedStringIndex] = inputString[z];
-							fixedStringIndex++;
-							if(fixedStringIndex == memorySize)
-							{
-								memorySize *= 2;
-								fixedString = (char*)realloc(fixedString,sizeof(char) * memorySize);
-
-							}
-						}
-						if(fixedStringIndex +1 == memorySize){
-							fixedString = (char*)realloc(fixedString,sizeof(char)*(memorySize +1));
-						}
-
-						fixedString[fixedStringIndex] = '\0';
-						fixedStringIndex++;
-
-						if(debugOn ==1)printf("Current fixed stirng %s\n", fixedString);
-						//string is now fixed
-						free(inputString);
-						inputString = (char*)malloc(sizeof(char) *(int)strlen(fixedString));
-						strcpy(inputString, fixedString);
-						free(fixedString);
-						free(leftNum);
-						free(rightNum);
-
-
-						int foundOperator = 0;
-						for(int z = 0; z < (int)strlen(inputString);z++)
-						{
-							if(debugOn ==1)printf("Current char in inputstring =>%c\n", inputString[z]);
-							if(isOperator(inputString[z]) == 1)
-							{
-								foundOperator = 1; //not done
-								break;
-							}
-						}
-						if(foundOperator == 0)//no more operators
-						{
-							//done = 1; //finished
-						}
-					}
-					else
-					{
-						//printf("found number");
-						//need to check if there are any operators in the string
-						for(int z = j; z <= (int)strlen(inputString);z++)
-						{
-							//printf("Current char in inputstring =>%c\n", inputString[z]);
-							stringIsAllNumbers = stringIsAllNumbers && (isOperator(inputString[z]) == 0);
-						}
-						if(stringIsAllNumbers == 1)
-						{
-							if(debugOn ==1)printf("string was all numbers\n");
-							//done = 1;
-							return atof(inputString);
-
-						}
-					}
-				}
-			}
-		}
-//	}
-
-
-	if(debugOn ==1)printf("Final result is %s", resultString);
-
-
-	return result;
-}
-
-
+/*
+ * Determines which operation to apply to two numbers
+ * */
 double compute(char operator,char* leftNum,char* rightNum){
 	/**
 	*	Used as reference to commandList[]
@@ -1008,50 +871,35 @@ double compute(char operator,char* leftNum,char* rightNum){
 	*	{NULL, NULL, NULL}
 	**/
 
-
-
-
-	//todo use correct names for function
 	double result = 0;
 	char* numbers[3] = {NULL,leftNum,rightNum};
 	switch(operator){
 	case 'x':
-		numbers[0] = commandList[2].nameString;
+		numbers[0] = commandList[2].nameString; //mul [left] [right].
 		result = commandList[2].function_p(3,numbers);
-		//result = mulNumbers(3,numbers);//mul [left] [right].
 		break;
 	case '/':
 		numbers[0] = commandList[3].nameString;
 		result = commandList[3].function_p(3,numbers);
-		//result = divNumbers(3,numbers);
 		break;
 	case '+':
 		numbers[0] = commandList[0].nameString; //printf("about to add\n");
 		result = commandList[0].function_p(3,numbers);
-		//printf("finished add\n");
-
-//		result = atof(leftNum);
-//		printf("leftNum %lf\n",atof(leftNum));
-//		printf("result -> %lf\n", result);
-//
-//		result += atof(rightNum);
-//		printf("result -> %lf\n", result);
-////		result = addNumbers(2,numbers);
 		break;
 	case '-':
 		numbers[0] = commandList[1].nameString;
 		result = commandList[1].function_p(3,numbers);
-		//result = subNumbers(2,numbers);
 		break;
 	}
 
-
 	return result;
-
-
 }
 
-
+/*
+ * Determines if char input is an operator or not
+ * Return 1 if true
+ * 0 if false
+ * */
 int isOperator(char input ){
 	if(input == 'x' || input == '/' || input == '+' || input == '-'){
 		return 1;
