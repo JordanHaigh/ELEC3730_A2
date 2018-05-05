@@ -475,7 +475,7 @@ double divNumbers(uint8_t argNum, char* argStrings[])
 {
 	double currentDiv = 0;
 	uint8_t firstRun = 1;
-	if(argStrings[2] == "0"){
+	if(strcmp(argStrings[2],"0") == 0){
 		printf("Error cannot divide by 0\n");
 		return 0;
 

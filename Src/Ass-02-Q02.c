@@ -297,17 +297,17 @@ void analyseTouch(Button currentButtonPressed)
 
 		if(strcmp(buttonText,"0") == 0)
 		{
-			if(debugOn ==1)printf("0 was entered. Nothing to achieve on blank string\n");
+			printf("0 was entered. Nothing to achieve on blank string\n");
 			//return;
 		}
 		else if(strcmp(buttonText, "=") == 0)
 		{
-			if(debugOn ==1)printf("= was entered. Nothing to achieve on blank string\n");
+			printf("= was entered. Nothing to achieve on blank string\n");
 			//return;
 		}
 		else if(strcmp(buttonText, "clr") == 0)
 		{
-			if(debugOn ==1)printf("clr was entered. Nothing to achieve on blank string\n");
+			printf("clr was entered. Nothing to achieve on blank string\n");
 			//return;
 		}
 		else if(strcmp(buttonText, "1") == 0 ||strcmp(buttonText, "2") == 0 || strcmp(buttonText, "3") == 0 ||
@@ -375,7 +375,7 @@ void analyseTouch(Button currentButtonPressed)
 		}
 		else
 		{
-			if(debugOn ==1)printf("error. already placed decimal point...\n");
+			printf("error. already placed decimal point...\n");
 			//return;
 		}
 	}
@@ -396,7 +396,7 @@ void analyseTouch(Button currentButtonPressed)
 				(previousChar == 'x' && strcmp(buttonText, "x") == 0))
 		{
 			//error cant do that mate
-			if(debugOn ==1)printf("Error. cannot have 2 operators in a row\n");
+			printf("Error. cannot have 2 operators in a row\n");
 			return;
 		}
 		//if previous char is operator and new char is operator
@@ -441,7 +441,7 @@ void analyseTouch(Button currentButtonPressed)
 		char lastChar = inputString[inputStringIndex];
 		if(lastChar == '+' || lastChar ==  '-' || lastChar ==  '/' ||  lastChar == 'x')
 		{
-			if(debugOn ==1)printf("Error. last character is an operator. cannot do equals yet\n");
+			printf("Error. last character is an operator. cannot do equals yet\n");
 		}
 		else
 		{
@@ -676,7 +676,7 @@ double doEquals2(){
 
 	//printf("between");
 	if(numbers == NULL){
-		if(debugOn ==1)printf("malloc failedd\n");
+		printf("malloc failedd\n");
 		return 0;
 
 	}
@@ -709,7 +709,6 @@ double doEquals2(){
 
 					strcpy(numbers[numbersIndex], "-");
 					strcat(numbers[numbersIndex], answer);
-					if(debugOn ==1)printf("balh %s", numbers[numbersIndex]);
 					if(numbers[numbersIndex][1] =='-'){
 						if(debugOn ==1)printf("answer %s\n", &answer[1]);
 						strcpy(numbers[numbersIndex], &answer[1]);
