@@ -51,6 +51,8 @@ double doEquals2();
 
 int isOperator(char);
 int maxSize = 20;
+#define MAXINPUTLENGTH 26
+static int currentInputLength = 0;
 
 double compute(char operator,char* leftNum,char* rightNum);
 char answer[50]; //Getting around malloc bullshit - Other demonstrator (He took over from Lyall for Fri 2-4pm Week 8)
@@ -440,6 +442,7 @@ void analyseTouch(Button currentButtonPressed)
 			BSP_LCD_FillRect(1, 1, 318, 78);
 			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 			equalsPressed = 1;
+			currentInputLength = 0;
 //	      	BSP_LCD_DisplayStringAt(20,40,resultString ,LEFT_MODE);
 
 		}
@@ -453,6 +456,7 @@ void analyseTouch(Button currentButtonPressed)
 		firstTime = 1;
 		inputStringIndex = 0;
 		decimalPointPlaced = 0;
+		currentInputLength = 0;
 		//make white rectangle
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 		BSP_LCD_FillRect(1, 1, 318, 78);
@@ -538,7 +542,6 @@ void analyseTouch(Button currentButtonPressed)
 			inputStringIndex = 0;
 			decimalPointPlaced = 0;
 
-
 		}else{
 			if(isOperator(inputString[inputStringIndex])){
 				//printf("1\n");
@@ -558,6 +561,7 @@ void analyseTouch(Button currentButtonPressed)
 
 			inputString[inputStringIndex] = '\0';
 			inputStringIndex -=1;
+			currentInputLength -=1;
 
 		}
 
@@ -580,14 +584,24 @@ void analyseTouch(Button currentButtonPressed)
  * */
 void concatenateButtonText(char* buttonText)
 {
-	if(inputStringIndex + 3 >= maxSize){
-		maxSize *= 2;
-		inputString = (char*)realloc(inputString, maxSize*sizeof(char));
+	currentInputLength += (int)strlen(buttonText);
+	if(currentInputLength > MAXINPUTLENGTH)
+	{
+		printf("stop. you can't enter any more...\n");
+		currentInputLength -=(int)strlen(buttonText);
 	}
-//	inputString = realloc(inputString, (inputStringIndex + 2) * sizeof(char));
-	strcat(inputString, buttonText);
-	inputStringIndex += strlen(buttonText);
-	if(debugOn ==1)printf("inputstringindex => %d\n", inputStringIndex);
+	else
+	{
+		if(inputStringIndex + 3 >= maxSize){
+			maxSize *= 2;
+			inputString = (char*)realloc(inputString, maxSize*sizeof(char));
+		}
+	//	inputString = realloc(inputString, (inputStringIndex + 2) * sizeof(char));
+		strcat(inputString, buttonText);
+		inputStringIndex += strlen(buttonText);
+		if(debugOn ==1)printf("inputstringindex => %d\n", inputStringIndex);
+	}
+
 
 }
 
