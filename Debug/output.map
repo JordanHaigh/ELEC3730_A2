@@ -6913,7 +6913,7 @@ LOAD c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.13
                 0x00001569       0x22 c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.13.2.201703061525/tools/compiler/bin/../lib/gcc/arm-none-eabi/5.4.1/armv7e-m/fpu/crtn.o
 OUTPUT(Ass-02-STM32.elf elf32-littlearm)
 
-.debug_info     0x00000000     0xfa4a
+.debug_info     0x00000000     0xfa51
  .debug_info    0x00000000      0x711 Drivers/BSP/ili9325.o
  .debug_info    0x00000711      0xdf6 Drivers/BSP/openx07v_c_lcd.o
  .debug_info    0x00001507      0xb5b Drivers/BSP/touch_panel.o
@@ -6931,19 +6931,19 @@ OUTPUT(Ass-02-STM32.elf elf32-littlearm)
  .debug_info    0x00007266     0x1173 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
  .debug_info    0x000083d9      0xa0c Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_fsmc.o
  .debug_info    0x00008de5      0x1df Src/Ass-02-Lib.o
- .debug_info    0x00008fc4     0x17d0 Src/Ass-02-Q01.o
- .debug_info    0x0000a794      0xb28 Src/Ass-02-Q02.o
- .debug_info    0x0000b2bc      0x19f Src/Ass-02.o
- .debug_info    0x0000b45b      0x945 Src/fsmc.o
- .debug_info    0x0000bda0      0x46f Src/gpio.o
- .debug_info    0x0000c20f      0xe9b Src/main.o
- .debug_info    0x0000d0aa      0xb13 Src/spi.o
- .debug_info    0x0000dbbd      0x2f0 Src/stm32f4xx_hal_msp.o
- .debug_info    0x0000dead      0x655 Src/stm32f4xx_it.o
- .debug_info    0x0000e502      0x6ca Src/syscalls.o
- .debug_info    0x0000ebcc      0x4fb Src/system_stm32f4xx.o
- .debug_info    0x0000f0c7      0x8d9 Src/usart.o
- .debug_info    0x0000f9a0       0xaa startup/startup_stm32f407xx.o
+ .debug_info    0x00008fc4     0x17d7 Src/Ass-02-Q01.o
+ .debug_info    0x0000a79b      0xb28 Src/Ass-02-Q02.o
+ .debug_info    0x0000b2c3      0x19f Src/Ass-02.o
+ .debug_info    0x0000b462      0x945 Src/fsmc.o
+ .debug_info    0x0000bda7      0x46f Src/gpio.o
+ .debug_info    0x0000c216      0xe9b Src/main.o
+ .debug_info    0x0000d0b1      0xb13 Src/spi.o
+ .debug_info    0x0000dbc4      0x2f0 Src/stm32f4xx_hal_msp.o
+ .debug_info    0x0000deb4      0x655 Src/stm32f4xx_it.o
+ .debug_info    0x0000e509      0x6ca Src/syscalls.o
+ .debug_info    0x0000ebd3      0x4fb Src/system_stm32f4xx.o
+ .debug_info    0x0000f0ce      0x8d9 Src/usart.o
+ .debug_info    0x0000f9a7       0xaa startup/startup_stm32f407xx.o
 
 .debug_abbrev   0x00000000     0x2f41
  .debug_abbrev  0x00000000      0x1f6 Drivers/BSP/ili9325.o

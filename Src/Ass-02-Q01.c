@@ -163,19 +163,26 @@ double validateAndRunRoot(uint8_t flag, uint8_t argNum, char* argStrings[])
 }
 
 /*
- *
+ * Calculate the square root of the second inputted argument
  * */
 double squareRoot(char* argStrings[])
 {
 	double result = strtof(argStrings[1],NULL);
 	return sqrtf(result);
 }
-
+/*
+ * Calculate the cube root of the second inputted argument
+ * */
 double cubeRoot(char* argStrings[])
 {
 	return cbrtf(strtof(argStrings[1],NULL));
 }
 
+/*
+ * Validate the arguments of the string to make sure they can be used for calculating the power
+ * If all arguments are valid and or numerals, we can calculate the power of the number
+ * Bonus easter egg if three arguments are entered
+ * */
 double validatePower(uint8_t argNum, char* argStrings[])
 {
 	double result = 0;
@@ -195,12 +202,19 @@ double validatePower(uint8_t argNum, char* argStrings[])
 	}
  	return result;
 }
-
+/*
+ * Calculate the first argument to the power of the second argument
+ * */
 double power(char* argStrings[])
 {
 	return powf(strtof(argStrings[1],NULL),strtof(argStrings[2],NULL));
 }
 
+/*
+ * Validate the arguments of the string to make sure they can be used for calculating the modulo
+ * If all arguments are valid and or numerals, we can calculate the modulo of the two numbers
+ * Only accepted two INTEGERS as arguments
+ */
 double validateModulo(uint8_t argNum, char* argStrings[])
 {
 	double result = 0;
@@ -217,11 +231,20 @@ double validateModulo(uint8_t argNum, char* argStrings[])
 	return result;
 }
 
+/*
+ * Calculate and return the modulo of the first number mod second number
+ * */
 int modulo(char* argStrings[])
 {
 	return (int)strtof(argStrings[1],NULL) % (int)strtof(argStrings[2],NULL);
 }
 
+/*
+ * Validity check used by mathematical functions. Depending on the flag and expected word count, it will
+ * return 1 for true and 0 for false.
+ * Add and mul can accept any number of arguments
+ * Sub, div, and other functions require two arguments
+ * */
 uint8_t checkArgumentLength2(uint8_t flag, uint8_t expectedWordCount, uint8_t argNum)
 {
 	if(argNum == 1)
@@ -240,7 +263,10 @@ uint8_t checkArgumentLength2(uint8_t flag, uint8_t expectedWordCount, uint8_t ar
 }
 
 
-
+/*
+ * Validity check used by mathematical functions. It will return true or false depending whether the argument is all
+ * numerals or not. Also takes into account the positioning of the decimal point (decimal point cant be placed twice for same number)
+ * */
 uint8_t checkForNumericArgument2(uint8_t processingIntegerFlag,uint8_t argNum, char* argStrings[])
 {
 	uint8_t foundDecimalPoint = 0;
@@ -262,8 +288,10 @@ uint8_t checkForNumericArgument2(uint8_t processingIntegerFlag,uint8_t argNum, c
 				}
 			}
 
-			else if(!(argStrings[i][j] >= 48 && argStrings[i][j] <= 57) && !argStrings[i][j] == '-') //if the number is not within 0-9 (non numeric)
+			else if(!(argStrings[i][j] >= 48 && argStrings[i][j] <= 57) && !argStrings[i][j] == '-')
 			{
+				//if the number is not within 0-9 (non numeric)
+
 				printf("Error. Not a valid input\n");
 				return 0;
 			}
@@ -282,6 +310,10 @@ uint8_t checkForNumericArgument2(uint8_t processingIntegerFlag,uint8_t argNum, c
 	return 1;
 }
 
+/*
+ * Validity check used before actually completing addition. Number of arguments must be greater than or equal to 1
+ * Needs to check that the arguments are numeric as well before adding numbers
+ * */
 double validateAddition(uint8_t argNum, char* argStrings[])
 {
 	double result = 0;
@@ -298,7 +330,9 @@ double validateAddition(uint8_t argNum, char* argStrings[])
 	return result;
 }
 
-
+/*
+ * Adds numbers together and returns as a double
+ * */
 double addNumbers(uint8_t argNum, char* argStrings[])
 {
 
@@ -313,6 +347,10 @@ double addNumbers(uint8_t argNum, char* argStrings[])
 	return currentSum;
 }
 
+/*
+ * 	Validity check before subtracting arguments. Number of arguments must only be 2.
+ * 	Needs to check that all arguments are numeric before subtracting
+ * */
 double validateSubtraction(uint8_t argNum, char* argStrings[])
 {
 	double result = 0;
@@ -329,6 +367,10 @@ double validateSubtraction(uint8_t argNum, char* argStrings[])
 	return result;
 }
 
+/*
+ * 	Subtract second argument from first argument
+ * 	Flag used to determine first argument
+ * */
 double subNumbers(uint8_t argNum, char* argStrings[])
 {
 	double currentSub = 0;
@@ -350,6 +392,11 @@ double subNumbers(uint8_t argNum, char* argStrings[])
 
 }
 
+/*
+ * 	Validity check before calculating multiplication. Argument length can be infinite
+ * 	Must check that arguments are numerical before starting multiplication.
+ * 	Once valid, we can compute multiplication
+ * */
 double validateMultiplication(uint8_t argNum, char* argStrings[])
 {
 	double result = 0;
@@ -367,6 +414,11 @@ double validateMultiplication(uint8_t argNum, char* argStrings[])
 	return result;
 }
 
+/*
+ * Multiply N numbers together.
+ * Uses a flag to start the first argument as the current multiple.
+ * That way it isnt always going to be returning 0;
+ * */
 double mulNumbers(uint8_t argNum, char* argStrings[])
 {
 	double currentMul = 0;
@@ -393,6 +445,10 @@ double mulNumbers(uint8_t argNum, char* argStrings[])
 	return currentMul;
 }
 
+/*
+ * Validity check before calculating the division of two numbers. Must be only two arguments
+ * Validity check of numerals conducted before division can start
+ * */
 double validateDivision(uint8_t argNum, char* argStrings[])
 {
 	double result = 0;
@@ -409,6 +465,11 @@ double validateDivision(uint8_t argNum, char* argStrings[])
 	return result;
 }
 
+/*
+ * Divide number 1 by number 2
+ * Uses flag to allocate first number as current divider
+ * If any of the inputs is a zero, straight away returns zero. (Always going to be zero and gets around DivideByZeroException)
+ * */
 double divNumbers(uint8_t argNum, char* argStrings[])
 {
 	double currentDiv = 0;
@@ -418,7 +479,8 @@ double divNumbers(uint8_t argNum, char* argStrings[])
 		double stringToDouble = strtof((argStrings)[i],NULL);
 		if(stringToDouble == 0.0)
 		{
-			return 0.0; //it was always going to be a 0.0 result regardless
+			return 0.0; //it was always going to be a 0.0 result regardless - smart boy
+			//gets around the divide by zero exception
 		}
 
 		if(firstRun == 1)
@@ -434,7 +496,12 @@ double divNumbers(uint8_t argNum, char* argStrings[])
 
 }
 
-
+/*
+ * Allows for debug messages to be turned on or off
+ * If no arguments supplied, it will print the current status of debug
+ * If one argument supplied <on | off> it will toggle the current status
+ * If more than one argument, seek help
+ * */
 void debugMode(uint8_t argNum, char* argStrings[])
 {
 	if(argNum < 2)
@@ -476,6 +543,11 @@ void debugMode(uint8_t argNum, char* argStrings[])
 
 }
 
+/*
+ * Help desk supplies all help information about math functions
+ * If no arguments supplied, prints all information about functions
+ * If one SPECIFIC math function supplied, prints information about THAT function
+ * */
 void helpDesk(uint8_t argNum, char* argStrings[])
 {
 	if(argNum < 2) {
@@ -530,7 +602,7 @@ void helpDesk(uint8_t argNum, char* argStrings[])
 		printf("Error. Unrecognised command. Seek help\n");
 }
 
-
+/*Init method for Command Line - Does nothing important*/
 void CommandLineParserInit(void)
 {
   // Print welcome message
@@ -539,7 +611,14 @@ void CommandLineParserInit(void)
 //  printf("Command Line Parser Example\n");
 }
 
-
+/*
+ * Continuous looping method
+ * If the project is running through WINNT - Builds input string until 'enter' key is inputted
+ * If project is running through STM32 (PUTTY) - Builds input string in putty until entered
+ *
+ * ONE MUST FINISH BEFORE USING THE OTHER AGAIN
+ * CANNOT MULTI TYPE AT SAME TIME
+ * */
 void CommandLineParserProcess(void)
 {
   uint8_t c;
@@ -558,16 +637,16 @@ void CommandLineParserProcess(void)
     	// Get one line of input
     	printf("--> Question 1 - Enter text:\n");
     	i=0;
-    	c=getchar();
-    	while (c != 13 && i < 100)
+    	c=getchar(); //keep building
+    	while (c != 13 && i < 100) //while enter isnt hit
     	{
-    		printf("%c",c);
+    		printf("%c",c); //print to putty and allocate to array
     		command_line[i]=c;
     		i++;
     	    c=getchar();
     	}
     	printf("\n");
-    	command_line[i]=0;
+    	command_line[i]=0; //done with input, start parsing
 
     	// Parse the input and print result
       	wordCount = string_parser(command_line, &array_of_words);
@@ -588,7 +667,11 @@ void CommandLineParserProcess(void)
 
 
 
-
+/*
+ * Builds input string from command line
+ * gets char by char and keeps reallocating till finished with input string
+ * Once enter is hit, it will begin to parse the string into keywords and begin analysing
+ * */
 void buildInputString(uint8_t c){
 	if(buildInputStringFirstTime == 1)	  {
 	  newString = (char*)malloc(sizeof(char*) * length); //start of string. will have reallocation of memory if string is longer
@@ -617,11 +700,12 @@ void buildInputString(uint8_t c){
 	else{
 		newString = (char*)realloc(newString, sizeof(newString)+1);
 
-		if(c == '\0' || c == 10){
-		  newString[stringIndex] = '\0';
-
+		if(c == '\0' || c == 10){ //if enter
+		  newString[stringIndex] = '\0'; //null terminate string
+		  //begin parse
 		  wordCount = string_parser(newString, &array_of_words);
 		  if(debugOn == 1) printArrayOfWords();
+		  //begin analysis of keywords
 		  analyseKeywords(wordCount, array_of_words);
 		  freeEverything();
 
@@ -631,17 +715,23 @@ void buildInputString(uint8_t c){
 
 		}
 		else{
-		  newString[stringIndex] = c;
+		  newString[stringIndex] = c; //keep appending
 		  stringIndex++;
-		  if(stringIndex == length)
+		  if(stringIndex == length) //if string length is maxed out
 		  {
-			  length *=2;
+			  length *=2; //allocate more memory
 			  newString = (char*)realloc(newString,sizeof(char*) * length);
 		  }
 		}
 	}
 }
 
+/*
+ * String parser from Assignment 1
+ * Same as before, goes through string and determines new string without backspaces
+ * Loops to determine number of words, number of characters in each word
+ * Allocates accordingly
+ * */
 int string_parser(char *inp, char **array_of_words_p[])
 {
 	/**********************************SETUP**********************************/

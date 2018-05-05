@@ -1,11 +1,21 @@
+/**
+ * ELEC3730 ASSIGNMENT 2
+ * QUESTION 1 - COMMAND LINE PARSER
+ * JORDAN HAIGH AND EVAN GRESHAM
+ * HEADER FILE
+ *
+ * File takes in user input either from STM32 (Putty) or command line
+ * Utilises keywords to perform mathematical functions
+ * */
+
+
+
 
 
 void buildInputString(uint8_t c);
 int string_parser(char *inp, char **array_of_words_p[]);
 void analyseKeywords(uint8_t argNum, char* argStrings[]);
 
-//uint8_t checkForNumericArgument(uint8_t processingIntegerFlag);
-//uint8_t checkArgumentLength(uint8_t flag, uint8_t expectedWordCount);
 
 uint8_t checkForNumericArgument2(uint8_t processingIntegerFlag, uint8_t argNum, char* argStrings[]);
 uint8_t checkArgumentLength2(uint8_t flag, uint8_t expectedWordCount, uint8_t argNum);
@@ -37,10 +47,13 @@ int modulo(char* argStrings[]);
 typedef struct
 {
 	char* nameString; //command string
-	double (*function_p)(uint8_t argNum, char* argStrings[]); //function pointer. todo make sure this is right for evan to use (is it necessary?)
+	double (*function_p)(uint8_t argNum, char* argStrings[]); //function pointer
 	char* helpString; //help message
 } command_s;
 #endif
 
-const command_s commandList[11]; //todo alter later?
+//Global variables to be used in Q1 and in Q2
+const command_s commandList[11];
 uint8_t debugOn;
+
+
