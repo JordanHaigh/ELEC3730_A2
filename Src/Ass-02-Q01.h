@@ -43,3 +43,4 @@ typedef struct
 #endif
 
 const command_s commandList[11]; //todo alter later?
+uint8_t debugOn;
