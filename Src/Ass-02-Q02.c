@@ -36,12 +36,12 @@ static int firstTime = 1; //Used in analyse touch
 static int equalsPressed = 0; //Used when outputting to screen that will result will stay till user input again
 
 
-void CalculatorInit(void);
-void CalculatorProcess(void);
+void CalculatorInit(void); //Initiate calculator for running
+void CalculatorProcess(void); //Loop to read calculator inputs
 
-Button buildButton(int x, int y, int w, int h, int id);
-int buttonHere(int x, int y, Button button);
-void showButton(Button button);
+Button buildButton(int x, int y, int w, int h, int id); //Instantiate buttons
+int buttonHere(int x, int y, Button button); //Determine if button at X,Y coordinate - return Button ID if true
+void showButton(Button button); //Display button on Calculator
 void buttonToString(Button button);
 
 void analyseTouch(Button currentButtonPressed);
@@ -334,15 +334,103 @@ void analyseTouch(Button currentButtonPressed)
 		{
 			strcpy(inputString, buttonText);
 			inputStringIndex =2;
+			currentInputLength = strlen(buttonText);
 //			concatenateButtonText(buttonText);
 
 
 		}else if(strcmp(buttonText, "+-") == 0){
 			strcpy(inputString, "-0");
-			inputStringIndex =2;
+			inputStringIndex = 1;
+			currentInputLength = strlen(buttonText);
 
 
 		}
+
+	}
+	//We have -0 and want to swap it to -Num instead
+	else if(strcmp(inputString,"-0") == 0)
+	{
+		 if(strcmp(buttonText, "1") == 0 ||strcmp(buttonText, "2") == 0 || strcmp(buttonText, "3") == 0 ||
+					strcmp(buttonText, "4") == 0 ||strcmp(buttonText, "5") == 0 || strcmp(buttonText, "6") == 0 ||
+					strcmp(buttonText, "7") == 0 || strcmp(buttonText, "8") == 0 || strcmp(buttonText, "9") == 0)
+		{
+			 inputString[1] = buttonText[0];
+		}
+		 else if(strcmp(buttonText, "+") == 0 || strcmp(buttonText, "-") == 0 ||
+				strcmp(buttonText, "/") == 0 || strcmp(buttonText, "x") == 0)
+		{
+			concatenateButtonText(buttonText);
+		}
+		 else if(strcmp(buttonText, "del") == 0)
+		 {
+			 BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+			 BSP_LCD_FillRect(1, 1, 318, 78);
+			 BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
+			 inputString[inputStringIndex] = '\0';
+			 inputStringIndex = 0;
+			 currentInputLength = 1;
+		 }
+		 else if(strcmp(buttonText,"=") == 0)
+		 {
+			 double result = doEquals2();
+
+			char resultString [64];
+			snprintf(resultString, sizeof(resultString), "%.9lg",result);
+			strcpy(inputString, resultString);
+			strcpy(answer,resultString);
+			//reset variables
+
+			firstTime = 1;
+			inputStringIndex = 0;
+			decimalPointPlaced = 0;
+			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+			BSP_LCD_FillRect(1, 1, 318, 78);
+			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+			equalsPressed = 1;
+			currentInputLength = 0;
+		 }
+		 else if(strcmp(buttonText,".") == 0)
+		 {
+			concatenateButtonText(buttonText);
+			decimalPointPlaced = 1;
+		 }
+		 else if(strcmp(buttonText,"0") == 0)
+		 {
+			 printf("Error. No point adding more zeros \n");
+		 }
+		 else if(strcmp(buttonText,"+-") == 0)
+		 {
+			 //reset string back to 0
+			 BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+			BSP_LCD_FillRect(1, 1, 318, 78);
+			//revert to black text
+			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+			strcpy(inputString,"0");
+			inputStringIndex--;
+			currentInputLength--;
+		 }
+		 else if(strcmp(buttonText,"ans") == 0)
+		 {
+			 printf("Error. Cannot add answer without operator\n");
+		 }
+		 else if(strcmp(buttonText, "clr") == 0)
+		 {
+			strcpy(inputString,"0");
+			//free(inputString);
+			firstTime = 1;
+			inputStringIndex = 0;
+			decimalPointPlaced = 0;
+			currentInputLength = 0;
+			//make white rectangle
+			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+			BSP_LCD_FillRect(1, 1, 318, 78);
+			//revert to black text
+			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
+		 }
+		 else
+			 printf("Invalid operation - How did you get here?\n");
 
 	}
 
@@ -524,7 +612,6 @@ void analyseTouch(Button currentButtonPressed)
 
 			}else{
 				//now temp pos is pointing to the position in the array before the current number (hopefully)
-				//todo check for size
 				//shift everything forward
 				for(int i = inputStringIndex; i>tempPos; i--){
 					inputString[i+1] = inputString[i];
@@ -570,7 +657,7 @@ void analyseTouch(Button currentButtonPressed)
 				while(tempPos >=0 && !isOperator(inputString[tempPos])){
 					if(inputString[tempPos] == '.'){
 						//printf("2\n");
-						decimalPointPlaced = 1; //todo should this be 0?
+						decimalPointPlaced = 1;
 						break;
 					}
 					tempPos -=1;
@@ -608,6 +695,8 @@ void analyseTouch(Button currentButtonPressed)
 		if(debugOn ==1)printf("Hey you pressed a button that doesnt have implementation yet\n");
 	}
 
+	if(debugOn ==1)printf("InputStringIndex=> %d\n", inputStringIndex);
+	if(debugOn ==1)printf("CurrentInputLength=> %d\n", currentInputLength);
 	if(debugOn ==1)printf("Current String=> %s\n", inputString);
 }
 
