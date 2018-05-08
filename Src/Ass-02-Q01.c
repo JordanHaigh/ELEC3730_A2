@@ -626,40 +626,44 @@ void CommandLineParserInit(void)
  * ONE MUST FINISH BEFORE USING THE OTHER AGAIN
  * CANNOT MULTI TYPE AT SAME TIME
  * */
+
+int i = 0;
+char command_line[101];
 void CommandLineParserProcess(void)
 {
+	//printf("hello\n");
   uint8_t c;
 
 
   // Check for input and echo back
 #ifdef STM32F407xx
-  if (HAL_UART_Receive(&huart2, &c, 1, 0x0) == HAL_OK) //code for running through stm board
+  if (HAL_UART_Receive(&huart2, &c, 1, 0x0) == HAL_OK) //Get input from putty
   {
-    HAL_GPIO_TogglePin(GPIOD, LD4_Pin); // Toggle LED4
+		printf("%c",c); //print to putty and allocate to array
+		command_line[i]=c;
+		i++;
 
-    	char c;
-    	int i;
-        char command_line[101];
-
-    	// Get one line of input
-    	printf("--> Question 1 - Enter text:\n");
-    	i=0;
-    	c=getchar(); //keep building
-    	while (c != 13 && i < 100) //while enter isnt hit
+    	//printf("\n");
+    	if(c == 13 || i+1 == 100) //If input is enter character or run out of chars
     	{
-    		printf("%c",c); //print to putty and allocate to array
-    		command_line[i]=c;
-    		i++;
-    	    c=getchar();
-    	}
-    	printf("\n");
-    	command_line[i]=0; //done with input, start parsing
+    		printf("\n");
 
-    	// Parse the input and print result
-      	wordCount = string_parser(command_line, &array_of_words);
-      	if(debugOn == 1) printArrayOfWords();
-      	analyseKeywords(wordCount, array_of_words);
-      	freeEverything();
+    		command_line[i-1]='\0'; //Need to replace enter character with null terminator
+
+			// Parse the input and print result
+			wordCount = string_parser(command_line, &array_of_words);
+			if(debugOn == 1) printArrayOfWords();
+			analyseKeywords(wordCount, array_of_words);
+			freeEverything();
+
+			//reset command line and i variable
+			for(int j = 0; command_line[j] != '\0';j++)
+			{
+				command_line[j] = ' ';
+			}
+			i = 0;
+    	}
+
 
   }
 #else
