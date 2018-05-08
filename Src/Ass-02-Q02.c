@@ -728,69 +728,56 @@ void concatenateButtonText(char* buttonText)
 }
 
 /*
- * Parseing of equation
- *
+ * Parseing of equation and outputs result
+ * 
  * */
 double doEquals2(){
 
-	if(debugOn ==1)printf("Entering doEquals2()   inputString %s\n", inputString);
+	
+	if(debugOn ==1)printf("Entering doEquals2()   inputString %s\n", inputString);//if debug on output message
+	
+	//initiate variables
 	int numberOfNumbers = 0;
 	int numberOfOperators = 0;
-	int lookingAtNumber = 0;
+	int lookingAtNumber = 0;//a boolean value used to tell if a you are currently looking at a number 
 
 	//iterate through entire string and find number of operators
 	for(int i = 0; i< (int)strlen(inputString); i++){
-		if(isOperator(inputString[i]) && lookingAtNumber!= 0){
+		if(isOperator(inputString[i]) && lookingAtNumber!= 0){ //if looking at an operator and its not directly after another operator
 			numberOfOperators +=1;
 			lookingAtNumber =0;
-		}else{
-			if(lookingAtNumber == 0){
+		}else{//if it is a number
+			if(lookingAtNumber == 0){//if it is a new number
 				numberOfNumbers +=1;
 				lookingAtNumber = 1;
 			}
 		}
 	}
-
-	//printf("before");
-
+	
 	//now we can allocate how many numbers we found in the input string
 	char numbers[numberOfNumbers][50];
-//	free(numbers[0]);
-//	free(numbers);
-
-	//printf("before2");
-
-//	numbers = (char*[])calloc(numberOfNumbers,sizeof(char*));
-
-
-	//printf("between");
-	if(numbers == NULL){
-		printf("malloc failedd\n");
+	
+	if(numbers == NULL){//malloc error
+		printf("Error: malloc failed\n");
 		return 0;
-
 	}
 
 	//allocate how many operators we found
 	char operators[numberOfOperators];
-
-//	char* operators = (char*)malloc(sizeof(char) * numberOfOperators);
-	//printf("after");
 
 	//iterate through input string again, this time determining the indexes of number and operator
 	int numbersIndex = 0;
 	int operatorIndex = 0;
 	int startI = 0;
 
+	//add all numbers to the numbers array and add all the operators to the operators array
 	for(int i = 0 ;i< (int)strlen(inputString); i++){
 		if(isOperator(inputString[i])){
-			if(startI <= i-1){
-//				printf("before3\n");
-//				char tempNumber[50];
-//				char* tempNumber = (char*)malloc(sizeof(char) * (i-startI+1));
-//				printf("after3\n");
-
+			if(startI <= i-1){//if looking at an operator then add the number which is before it to the array
 				strncpy(numbers[numbersIndex], &inputString[startI],i-startI);
 				numbers[numbersIndex][i-startI] = '\0';
+				
+				//if the number is ans or -ans then copy the global variable answer into the array
 				if(strcmp("ans", numbers[numbersIndex])==0){
 					strcpy(numbers[numbersIndex], answer);
 				}
@@ -798,39 +785,26 @@ double doEquals2(){
 
 					strcpy(numbers[numbersIndex], "-");
 					strcat(numbers[numbersIndex], answer);
-					if(numbers[numbersIndex][1] =='-'){
+					if(numbers[numbersIndex][1] =='-'){//--ans edge case
 						if(debugOn ==1)printf("answer %s\n", &answer[1]);
 						strcpy(numbers[numbersIndex], &answer[1]);
 					}
 				}
 
-//				double d;
-//				sscanf(tempNumber,"%.9lg",&d);
-//				numbers[numbersIndex] = tempNumber;
+				//reset counters and iterators
 				numbersIndex +=1;
-
-//				free(tempNumber);
 				startI = i+1;
 
 				operators[operatorIndex] = inputString[i];
 				operatorIndex +=1;
 
 
-			}else{//if previous index was an operator as well or this is the first position then this is a minus
 			}
-
-
-
 		}
 	}
 
 	//add the last number
 	int i = (int)strlen(inputString);
-//	printf("before3\n");
-//	char tempNumber[50];
-//				char* tempNumber = (char*)malloc(sizeof(char) * (i-startI+1));
-//	printf("after3\n");
-
 
 	//add the current number from the input string to the numbers array
 	strncpy(numbers[numbersIndex], &inputString[startI],i-startI);
@@ -846,23 +820,16 @@ double doEquals2(){
 			strcpy(numbers[numbersIndex], &answer[1]);
 		}
 	}
-
-//	tempNumber[i-startI] ='\0';
-//				double d;
-//				sscanf(tempNumber,"%.9lg",&d);
-//	numbers[numbersIndex] = tempNumber;
 	numbersIndex +=1;
 
-//	free(tempNumber);
 
 
-	//print information
+	//print all numbers stored and operators stored 
 	if(debugOn == 1)printf("numberOfNumbers %d  numberOfOperators %d\n",numberOfNumbers, numberOfOperators);
 	for(int i = 0 ; i< numberOfNumbers;i++){
 		if(debugOn ==1)printf("numbers %d : %s\n", i,numbers[i]);
 
 	}
-
 	for(int i = 0 ; i< numberOfOperators;i++){
 		if(debugOn ==1)printf("operators %d : %c\n", i,operators[i]);
 
@@ -887,80 +854,45 @@ double doEquals2(){
 
 					//now we need to repopulate the numbers and operators array
 					for(int j = 0; j< numberOfNumbers-1;j++){
-						if(j<i){//just copy it across
-//							strcpy(newNumbers[j], numbers[j]);
+						if(j<i){
+							//nothing needs to change
 
 						}else if(j==i){
-//							free(numbers[j]);
+							//copy the result into the first number used in the operation
 							strcpy(numbers[j], resultString);
-	//							newNumbers[j] = resultString;
-
 						}else{
-
-//							free(numbers[j]);
+							//move all numbers after the numbers used needs to be moved down
 							strcpy(numbers[j], numbers[j+1]);
-
-//							newNumbers[j] = numbers[j+1];
 						}
 					}
 					numberOfNumbers-=1;
-//					numbers = (char**)realloc(sizeof(char*) * numberOfNumbers);
+					//every element after the operator used needs to be moved down the array
 					for(int j = 0; j< numberOfOperators-1;j++){
-						if(j<i){//just copy it across
-//							strcpy(newNumbers[j], numbers[j]);
+						if(j<i){
+							//if j < i then we dont need to do anything
 
 						}else if(j>=i){
+							//if j >= i then move it down
 							operators[j] = operators[j+1];
 
-//							newNumbers[j] = numbers[j+1];
 						}
 					}
 
-					numberOfOperators -=1;
-//					operators = (char*)realloc(sizeof(char) * numberOfOperators);
+					numberOfOperators -=1;//we removed an operator
 
-
-
-
-//
-//					char** newNumbers = (char**)malloc(sizeof(char*) * numberOfNumbers-1);
-//					char* newOperators = (char*)malloc(sizeof(char) * numberOfOperators-1);
-//
-//
-//					for(int j = 0; j< numberOfNumbers-1;j++){
-//						if(j<i){//just copy it across
-//							strcpy(newNumbers[j], numbers[j]);
-//
-//						}else if(j==i){
-//							strcpy(newNumbers[j], resultString);
-////							newNumbers[j] = resultString;
-//
-//						}else{
-//							newNumbers[j] = numbers[j+1];
-//						}
-//					}
-//
-//					numbers = newNumbers;
-
+					
+					//if there are no operators left then we are done
 					if(numberOfOperators ==0){
+						
+						//convert string result to a double 
 						double finalResult =0;
 						sscanf(numbers[0],"%lg",&finalResult);
 						if(debugOn ==1)printf("finalResult %.9lg\n", finalResult );
-
-//						for(int n = 0; n< originalNumberOfNumbers ; n++){
-//							free(numbers[n]);
-//						}
-
-//						free(numbers[0]);
-
-
-//						free(numbers);
-
-//						free(operators);
+						//return the result as a double
 						return finalResult;
 					}
 
-
+					//we removed an element of operators so decriment i
 					i--;
 					break;
 
@@ -970,20 +902,12 @@ double doEquals2(){
 		}
 	}
 
-
+	//convert string result to a double 
 	double finalResult =0;
 	sscanf(numbers[0],"%lg",&finalResult);
-//	for(int n = 0; n< originalNumberOfNumbers ; n++){
-//		free(numbers[n]);
-//	}
-
-//	free(numbers[0]);
-//	free(numbers);
-//	free(operators);
+	if(debugOn ==1)printf("finalResult %.9lg\n", finalResult );
+	//return the result as a double
 	return finalResult;
-
-
-
 }
 
 /*
